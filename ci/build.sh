@@ -24,6 +24,16 @@
 
 set -eu
 
+# Several upstream pop-os repos (cosmic-greeter, cosmic-comp, ...) ship
+# their own rust-toolchain.toml pinning a specific channel (e.g.
+# "1.93"), which rustup auto-detects and silently switches to,
+# completely ignoring the nightly default this job installed --
+# breaking on any dep with a newer MSRV (elevate-pam/elevate-crypto
+# need 1.96). RUSTUP_TOOLCHAIN takes absolute precedence over any
+# rust-toolchain.toml/rust-toolchain file, so force it here, globally,
+# once, rather than patching every recipe's own toolchain file.
+export RUSTUP_TOOLCHAIN=nightly
+
 PKGDIR="${1:?usage: ci/build.sh <pkgdir>}"
 : "${CHOST:=x86_64-zainium-linux-musl}"
 : "${SUBSTRATE:=substrate}"
