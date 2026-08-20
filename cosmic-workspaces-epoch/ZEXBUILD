@@ -1,0 +1,23 @@
+maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
+pkgname=cosmic-workspaces-epoch
+pkgver=1.6.0
+pkgrel=0
+# Renamed from the old Alpine APKBUILD's pkgname=cosmic-workspaces to
+# match the actual upstream repo name (pop-os/cosmic-workspaces-epoch)
+# -- the old APKBUILD's builddir hack ("$pkgname-epoch-epoch-...") was
+# working around that mismatch; with pkgname matching upstream, the
+# plain "$pkgname-epoch-$pkgver" tag-archive dir name convention just
+# works. No systemd/logind Cargo feature. TODO: sha256sums.
+source="https://github.com/pop-os/cosmic-workspaces-epoch/archive/refs/tags/epoch-$pkgver.tar.gz"
+
+makedepends="cargo eudev-dev desktop-file-utils libinput-dev libxkbcommon-dev mesa-dev wayland-dev wayland-protocols"
+
+build() {
+	cd cosmic-workspaces-epoch-epoch-$pkgver
+	cargo build --release --target x86_64-unknown-linux-musl
+}
+
+package() {
+	cd cosmic-workspaces-epoch-epoch-$pkgver
+	make DESTDIR="$PAYLOAD_DIR" prefix=/overlayer/syshub install
+}
