@@ -7,7 +7,9 @@ pkgrel=0
 # (/usr/share/backgrounds/cosmic/...) is only used when no user config
 # points elsewhere -- audit separately if it needs relocating.
 # TODO: sha256sums.
-source="$pkgname-$pkgver.tar.gz::https://github.com/pop-os/cosmic-wallpapers/archive/refs/tags/epoch-$pkgver.tar.gz"
+# ci/build.sh's fetch loop doesn't implement Alpine abuild's
+# "destfile::URL" renaming syntax -- bare URL only.
+source="https://github.com/pop-os/cosmic-wallpapers/archive/refs/tags/epoch-$pkgver.tar.gz"
 
 package() {
 	cd cosmic-wallpapers-epoch-$pkgver
