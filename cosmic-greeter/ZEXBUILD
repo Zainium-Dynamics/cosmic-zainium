@@ -28,7 +28,7 @@ sha256sums=""  # TODO: re-pin for epoch-1.6.0 (was pinned for 1.5.0)
 # GitLab git remote (network access, same as any other cargo git dep --
 # no linux-pam-dev/libpam needed at all anymore, real Linux-PAM is fully
 # out of the picture, build- and run-time both).
-makedepends="cargo just eudev-dev libinput-dev libseat-dev libxkbcommon-dev wayland-dev"
+makedepends="cargo just eudev-dev libinput-dev libseat-dev libxkbcommon-dev wayland-dev dav1d-dev"
 
 build() {
     # GitHub tag-archive extracted-dir name is $pkgname-epoch-$pkgver, not $pkgname-$pkgver.
