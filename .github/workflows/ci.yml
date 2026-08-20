@@ -53,16 +53,27 @@ jobs:
 
       - name: Install build deps
         run: |
-          apk add --no-cache build-base linux-headers rust cargo just \
+          apk add --no-cache build-base linux-headers curl just \
             pkgconf coreutils findutils desktop-file-utils intltool appstream-glib \
             libxkbcommon-dev wayland-dev wayland-protocols mesa-dev pixman-dev \
             fontconfig-dev libdisplay-info-dev libinput-dev libseat-dev \
             libxcb-dev dbus-dev openssl-dev clang-dev llvm-dev eudev-dev \
             linux-pam-dev libseccomp-dev
-          # `cargo install` puts binaries in ~/.cargo/bin — nothing on
-          # Alpine's own apk rust/cargo adds that to PATH for you.
-          # GITHUB_PATH persists for every later step in this job.
+
+      # Every ZEXBUILD here builds with `--target x86_64-unknown-linux-musl`
+      # explicitly (see ci/build.sh's own comments on why). Alpine's own
+      # `apk add rust cargo` does NOT ship that as an installable rustup
+      # target -- it's just the host toolchain, so `cargo build --target
+      # x86_64-unknown-linux-musl` fails with E0463 "can't find crate for
+      # core" (no std/core artifacts for that target at all). Real rustup
+      # + `rustup target add` is the actual fix, not a workaround --
+      # permanent, every job, both here and in release below.
+      - name: Install rustup + x86_64-unknown-linux-musl target
+        run: |
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y \
+            --default-toolchain stable --target x86_64-unknown-linux-musl --profile minimal
           echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
+          "$HOME/.cargo/bin/rustup" target add x86_64-unknown-linux-musl
 
       - name: Cache cargo (registry + installed binaries)
         uses: actions/cache@v4
@@ -71,6 +82,7 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
             ~/.cargo/bin
+            ~/.rustup
           key: cargo-check-${{ runner.os }}-v1
 
       # substrate is published on crates.io (substrate-zainium, binary
@@ -87,8 +99,12 @@ jobs:
           # everything merged since, not just its own package. The base
           # branch NAME resolves to its live tip commit instead (we
           # have full history via fetch-depth: 0), so this stays
-          # correct across the PR's whole lifetime.
-          BASE_SHA: ${{ github.event.pull_request.base.ref }}
+          # correct across the PR's whole lifetime. Prefixed with
+          # origin/ -- actions/checkout doesn't create a local branch
+          # ref for the base branch on a PR checkout, only the
+          # origin/<branch> remote-tracking ref, so a bare branch name
+          # here fails `git rev-parse` ("Needed a single revision").
+          BASE_SHA: origin/${{ github.event.pull_request.base.ref }}
         run: |
           pkgs_out="$(mktemp)"
           if ! sh ci/changed-packages.sh > "$pkgs_out"; then
@@ -151,13 +167,21 @@ jobs:
 
       - name: Install build deps
         run: |
-          apk add --no-cache build-base linux-headers rust cargo just \
+          apk add --no-cache build-base linux-headers curl just \
             pkgconf coreutils findutils desktop-file-utils intltool appstream-glib \
             libxkbcommon-dev wayland-dev wayland-protocols mesa-dev pixman-dev \
             fontconfig-dev libdisplay-info-dev libinput-dev libseat-dev \
             libxcb-dev dbus-dev openssl-dev clang-dev llvm-dev eudev-dev \
             linux-pam-dev libseccomp-dev
+
+      # See the same step in the check job for why this is needed --
+      # permanent fix for E0463, not a one-off.
+      - name: Install rustup + x86_64-unknown-linux-musl target
+        run: |
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y \
+            --default-toolchain stable --target x86_64-unknown-linux-musl --profile minimal
           echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
+          "$HOME/.cargo/bin/rustup" target add x86_64-unknown-linux-musl
 
       - name: Cache cargo (registry + installed binaries)
         uses: actions/cache@v4
@@ -166,6 +190,7 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
             ~/.cargo/bin
+            ~/.rustup
           key: cargo-release-${{ runner.os }}-v1
 
       - name: Install substrate
