@@ -14,7 +14,15 @@ makedepends="cargo eudev-dev desktop-file-utils libinput-dev libxkbcommon-dev me
 
 build() {
 	cd cosmic-workspaces-epoch-epoch-$pkgver
-	cargo build --release --target x86_64-unknown-linux-musl
+	# No explicit --target here: the Makefile's own `install` target
+	# hardcodes target/release/$(BINARY) (no cross-target awareness),
+	# and Alpine's host toolchain already IS x86_64-unknown-linux-musl,
+	# so a plain build lands there directly -- explicit --target would
+	# instead output to target/x86_64-unknown-linux-musl/release/...,
+	# which the Makefile never looks for. Still gets our custom
+	# musl-loader RUSTFLAGS: cargo keys CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_RUSTFLAGS
+	# off the resolved target triple, not off whether --target was passed.
+	cargo build --release
 }
 
 package() {
