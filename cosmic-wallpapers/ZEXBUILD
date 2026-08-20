@@ -1,0 +1,17 @@
+maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
+pkgname=cosmic-wallpapers
+pkgver=1.5.0
+pkgrel=0
+# Data-only (wallpaper images), plain Makefile install. Default
+# wallpaper fallback path in cosmic-bg/xdg-desktop-portal-cosmic
+# (/usr/share/backgrounds/cosmic/...) is only used when no user config
+# points elsewhere -- audit separately if it needs relocating.
+# TODO: sha256sums.
+# ci/build.sh's fetch loop doesn't implement Alpine abuild's
+# "destfile::URL" renaming syntax -- bare URL only.
+source="https://github.com/pop-os/cosmic-wallpapers/archive/refs/tags/epoch-$pkgver.tar.gz"
+
+package() {
+	cd cosmic-wallpapers-epoch-$pkgver
+	make DESTDIR="$PAYLOAD_DIR" prefix=/overlayer/syshub install
+}
