@@ -1,0 +1,49 @@
+maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
+pkgname=cosmic-settings
+pkgver=1.6.0
+pkgrel=0
+# Commit archive at the exact pop-os/cosmic-settings commit pinned by
+# ~/cosmic-epoch's epoch-1.5.0 submodule set. Patches: systemd removed
+# from default features (code changes too, where pristine code doesn't
+# compile with systemd off) + any /usr/... path fixed to
+# /overlayer/syshub/... . No dbus/flatpak dependency exists in this
+# component's own Cargo.toml. Real tagged release + sha256sum, verified against Alpine's
+# own aports/community APKBUILD for the same package (same epoch-1.5.0
+# tag, same pop-os source).
+source="https://github.com/pop-os/cosmic-settings/archive/refs/tags/epoch-1.6.0.tar.gz
+0001-no-systemd-default.patch
+0002-overlayer-syshub-paths.patch
+0003-quantra-service-manager.patch
+9999-zainium-branding-logos.patch"
+
+sha256sums=""  # TODO: re-pin for epoch-1.6.0 (was pinned for 1.5.0)
+
+build() {
+    # GitHub tag-archive extracted-dir name is $pkgname-epoch-$pkgver, not $pkgname-$pkgver.
+    cd cosmic-settings-epoch-1.6.0
+
+    patch -p1 < ../0001-no-systemd-default.patch
+    patch -p1 < ../0002-overlayer-syshub-paths.patch
+    # Adds QuantraServiceManager (feature "quantra") to
+    # src/service_manager.rs, shelling out to quantra-ctl instead of
+    # rc-service/rc-update -- Zainium runs neither systemd nor real
+    # OpenRC, so the stock "openrc" feature would silently no-op
+    # (rc-service/rc-update aren't installed) instead of actually
+    # managing anything.
+    patch -p1 < ../0003-quantra-service-manager.patch
+    # Real Zainium artwork from Zainium-desgine/, saved under the same
+    # resources/{cosmic,pop}-*.svg filenames a distributor logo lookup
+    # would use. New files -- pristine upstream ships no resources/*.svg.
+    patch -p1 < ../9999-zainium-branding-logos.patch
+
+    # quantra feature: src/service_manager.rs's QuantraServiceManager
+    # (quantra-ctl start/stop/enable/disable/is-started), used in place
+    # of systemd/openrc now that "systemd" is off the default feature
+    # list (0001 patch).
+    cargo build --release --target x86_64-unknown-linux-musl --features quantra
+}
+
+package() {
+    just rootdir="$PAYLOAD_DIR" prefix=/overlayer/syshub \
+        cargo-target-dir=target/x86_64-unknown-linux-musl install
+}
