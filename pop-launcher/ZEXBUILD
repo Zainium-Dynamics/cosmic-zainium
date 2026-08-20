@@ -1,0 +1,72 @@
+maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
+pkgname=pop-launcher
+pkgver=1.6.0
+pkgrel=0
+# Commit archive at the exact pop-os/launcher commit pinned by
+# ~/cosmic-epoch's epoch-1.5.0 submodule set. Patches: systemd removed
+# from default features (code changes too, where pristine code doesn't
+# compile with systemd off) + any /usr/... path fixed to
+# /overlayer/syshub/... . No dbus/flatpak dependency exists in this
+# component's own Cargo.toml. No sha256sums yet (added once the source
+# URL is final).
+source="https://github.com/pop-os/launcher/archive/a332a3a73316a3595816dd02fe426a1d3543167a.tar.gz
+0001-overlayer-syshub-paths.patch"
+
+# Was previously a hand-rolled cross-compile env pointing at the mounted
+# ZAINIUM_DRIVE toolchain (not CI-portable). ci/build.sh already builds
+# natively inside an alpine:latest container -- x86_64-unknown-linux-musl
+# IS the host here, no cross sysroot needed -- and already exports
+# LDFLAGS/CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_RUSTFLAGS pointing at
+# Zainium's musl loader once install_toolchain_deps() has run. This
+# recipe only needs its own extra link args on top (libevdev/libmtdev,
+# from a transitive *-sys crate), same convention as every other
+# converted package.
+makedepends="cargo just libevdev-dev"
+
+build() {
+    # GitHub commit-archive extracted-dir name != $pkgname-$pkgver.
+    cd launcher-a332a3a73316a3595816dd02fe426a1d3543167a
+
+    patch -p1 < ../0001-overlayer-syshub-paths.patch
+
+    export CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_RUSTFLAGS="${CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_RUSTFLAGS:-} -C link-arg=-Wl,--allow-shlib-undefined -C link-arg=-levdev"
+
+    # Root Cargo.toml is itself a package ("pop-launcher", a lib, no
+    # [[bin]]) inside a workspace whose real binary lives in bin/
+    # ("pop-launcher-bin"). Plain `cargo build` with no -p only builds
+    # the current-dir package (the root lib), never touching bin/ --
+    # need -p explicitly, matching upstream's own justfile.
+    cargo build --release --target x86_64-unknown-linux-musl -p pop-launcher-bin
+}
+
+package() {
+    # pop-launcher's real justfile has no prefix/cargo-target-dir vars
+    # at all -- it hardcodes rootdir/usr/{bin,lib} with no override, so
+    # `just ... prefix=... install` fails outright ("overridden on the
+    # command line but not present in justfile"). Doing what
+    # install-bin/install-plugins/install-scripts do by hand instead,
+    # targeting /overlayer/syshub. Plugin list copied from the
+    # justfile's own `plugins :=` line -- keep in sync if upstream adds/
+    # removes one.
+    outdir=target/x86_64-unknown-linux-musl/release
+    bindir="$PAYLOAD_DIR"/overlayer/syshub/bin
+    plugindir="$PAYLOAD_DIR"/overlayer/syshub/lib/pop-launcher/plugins
+    scriptsdir="$PAYLOAD_DIR"/overlayer/syshub/lib/pop-launcher/scripts
+
+    install -Dm0755 "$outdir"/pop-launcher-bin "$bindir"/pop-launcher
+
+    for plugin in calc desktop_entries files find pop_shell pulse recent scripts terminal web cosmic_toplevel; do
+        dest="$plugindir/$plugin"
+        mkdir -p "$dest"
+        install -Dm0644 plugins/src/"$plugin"/*.ron "$dest"/
+        ln -srf "$bindir"/pop-launcher "$dest/$(echo "$plugin" | sed 's/_/-/')"
+    done
+
+    mkdir -p "$scriptsdir"
+    cp -r scripts/. "$scriptsdir"/
+    # substrate's layout scanner blocks any /usr reference in shipped
+    # file content -- these scripts' own #!/usr/bin/env shebangs trip
+    # it, same class of issue as the .desktop Exec= lines elsewhere.
+    find "$scriptsdir" -type f -exec \
+        sed -i '1s|^#!/usr/bin/env |#!/overlayer/syshub/bin/env |' {} +
+}
