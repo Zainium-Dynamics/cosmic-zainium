@@ -26,7 +26,22 @@ build() {
 
     patch -p1 < ../0001-overlayer-syshub-paths.patch
 
-    cargo build --release --target x86_64-unknown-linux-musl
+    # libspa-sys (pipewire-rs) uses bindgen -> clang-sys dlopen's
+    # libclang.so from its build-script, which is a host artifact and
+    # inherits musl's static-by-default -- a static binary can't
+    # dlopen at all ("Dynamic loading not supported"). Cargo's [host]
+    # config table fixes only host-artifact rustflags without touching
+    # this package's own --target output, but it's still unstable --
+    # needs -Z host-config -Z target-applies-to-host even on nightly.
+    export LIBCLANG_PATH="$(dirname "$(find /usr/lib -name 'libclang.so*' | head -1)")"
+    mkdir -p .cargo
+    cat > .cargo/config.toml <<-'EOF'
+	[host]
+	rustflags = ["-C", "target-feature=-crt-static"]
+	EOF
+
+    cargo build -Z host-config -Z target-applies-to-host \
+        --release --target x86_64-unknown-linux-musl
 }
 
 package() {
