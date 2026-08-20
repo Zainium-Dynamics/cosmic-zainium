@@ -2,7 +2,7 @@
 
 [package]
 name             = "cosmic-comp"
-version          = "1.5.0"
+version          = "1.6.0"
 description      = "COSMIC Wayland compositor, systemd-free (login1 via quantra-logind + oxibus)"
 license          = "GPL-3.0-only"
 maintainer       = "Ali Zain <alizain@zainiumdynamics.tech>"
