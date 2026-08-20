@@ -35,6 +35,28 @@ build() {
 }
 
 package() {
-    just rootdir="$PAYLOAD_DIR" prefix=/overlayer/syshub \
-        cargo-target-dir=target/x86_64-unknown-linux-musl install
+    # pop-launcher's real justfile has no prefix/cargo-target-dir vars
+    # at all -- it hardcodes rootdir/usr/{bin,lib} with no override, so
+    # `just ... prefix=... install` fails outright ("overridden on the
+    # command line but not present in justfile"). Doing what
+    # install-bin/install-plugins/install-scripts do by hand instead,
+    # targeting /overlayer/syshub. Plugin list copied from the
+    # justfile's own `plugins :=` line -- keep in sync if upstream adds/
+    # removes one.
+    outdir=target/x86_64-unknown-linux-musl/release
+    bindir="$PAYLOAD_DIR"/overlayer/syshub/bin
+    plugindir="$PAYLOAD_DIR"/overlayer/syshub/lib/pop-launcher/plugins
+    scriptsdir="$PAYLOAD_DIR"/overlayer/syshub/lib/pop-launcher/scripts
+
+    install -Dm0755 "$outdir"/pop-launcher-bin "$bindir"/pop-launcher
+
+    for plugin in calc desktop_entries files find pop_shell pulse recent scripts terminal web cosmic_toplevel; do
+        dest="$plugindir/$plugin"
+        mkdir -p "$dest"
+        install -Dm0644 plugins/src/"$plugin"/*.ron "$dest"/
+        ln -srf "$bindir"/pop-launcher "$dest/$(echo "$plugin" | sed 's/_/-/')"
+    done
+
+    mkdir -p "$scriptsdir"
+    cp -r scripts/. "$scriptsdir"/
 }
