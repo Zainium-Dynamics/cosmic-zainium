@@ -99,8 +99,12 @@ jobs:
           # everything merged since, not just its own package. The base
           # branch NAME resolves to its live tip commit instead (we
           # have full history via fetch-depth: 0), so this stays
-          # correct across the PR's whole lifetime.
-          BASE_SHA: ${{ github.event.pull_request.base.ref }}
+          # correct across the PR's whole lifetime. Prefixed with
+          # origin/ -- actions/checkout doesn't create a local branch
+          # ref for the base branch on a PR checkout, only the
+          # origin/<branch> remote-tracking ref, so a bare branch name
+          # here fails `git rev-parse` ("Needed a single revision").
+          BASE_SHA: origin/${{ github.event.pull_request.base.ref }}
         run: |
           pkgs_out="$(mktemp)"
           if ! sh ci/changed-packages.sh > "$pkgs_out"; then
