@@ -1,0 +1,34 @@
+maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
+pkgname=cosmic-applets
+pkgver=1.5.0
+pkgrel=0
+# Commit archive at the exact pop-os/cosmic-applets commit pinned by
+# ~/cosmic-epoch's epoch-1.5.0 submodule set. Patches: systemd removed
+# from default features (code changes too, where pristine code doesn't
+# compile with systemd off) + any /usr/... path fixed to
+# /overlayer/syshub/... . No dbus/flatpak dependency exists in this
+# component's own Cargo.toml. Real tagged release + sha256sum, verified against Alpine's
+# own aports/community APKBUILD for the same package (same epoch-1.5.0
+# tag, same pop-os source).
+source="https://github.com/pop-os/cosmic-applets/archive/refs/tags/epoch-1.5.0.tar.gz
+0001-no-desktop-systemd-scope.patch"
+
+sha256sums="ac9328e58f5e9cb9c7561a2ce4af212d4916d97c820741f0959366c7e1a0e3ba  epoch-1.5.0.tar.gz"
+
+build() {
+    # GitHub tag-archive extracted-dir name is $pkgname-epoch-$pkgver, not $pkgname-$pkgver.
+    cd cosmic-applets-epoch-1.5.0
+
+    patch -p1 < ../0001-no-desktop-systemd-scope.patch
+
+    cargo build --release --target x86_64-unknown-linux-musl
+}
+
+package() {
+    # This justfile's variable is `targetdir` (env('CARGO_TARGET_DIR',
+    # 'target')), not `cargo-target-dir` like other components' -- every
+    # justfile here names it differently, no universal CLI arg. The env
+    # var matches where build()'s --target already put the binaries.
+    export CARGO_TARGET_DIR=target/x86_64-unknown-linux-musl
+    just rootdir="$PAYLOAD_DIR" prefix=/overlayer/syshub install
+}
