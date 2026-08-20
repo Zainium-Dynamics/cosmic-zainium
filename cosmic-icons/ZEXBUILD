@@ -9,5 +9,8 @@ source="https://github.com/pop-os/cosmic-icons/archive/refs/tags/epoch-$pkgver.t
 makedepends="just"
 
 package() {
+	# No build() here -- nothing else cd's into the extracted dir for a
+	# data-only package, package() has to do it itself.
+	cd cosmic-icons-epoch-$pkgver
 	just rootdir="$PAYLOAD_DIR" prefix=/overlayer/syshub install
 }
