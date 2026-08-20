@@ -22,7 +22,6 @@ build() {
 }
 
 package() {
-	cd cosmic-idle-epoch-$pkgver
 	just rootdir="$PAYLOAD_DIR" prefix=/overlayer/syshub \
 		cargo-target-dir=target/x86_64-unknown-linux-musl install
 }
