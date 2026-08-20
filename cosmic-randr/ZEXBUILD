@@ -1,0 +1,19 @@
+maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
+pkgname=cosmic-randr
+pkgver=1.5.0
+pkgrel=0
+# No systemd/logind Cargo feature. TODO: sha256sums.
+source="$pkgname-$pkgver.tar.gz::https://github.com/pop-os/cosmic-randr/archive/refs/tags/epoch-$pkgver.tar.gz"
+
+makedepends="cargo just"
+
+build() {
+	cd cosmic-randr-epoch-$pkgver
+	cargo build --release --target x86_64-unknown-linux-musl
+}
+
+package() {
+	cd cosmic-randr-epoch-$pkgver
+	just rootdir="$PAYLOAD_DIR" prefix=/overlayer/syshub \
+		cargo-target-dir=target/x86_64-unknown-linux-musl install
+}
