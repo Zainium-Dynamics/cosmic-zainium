@@ -1,0 +1,40 @@
+maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
+pkgname=pop-launcher
+pkgver=1.6.0
+pkgrel=0
+# Commit archive at the exact pop-os/launcher commit pinned by
+# ~/cosmic-epoch's epoch-1.5.0 submodule set. Patches: systemd removed
+# from default features (code changes too, where pristine code doesn't
+# compile with systemd off) + any /usr/... path fixed to
+# /overlayer/syshub/... . No dbus/flatpak dependency exists in this
+# component's own Cargo.toml. No sha256sums yet (added once the source
+# URL is final).
+source="https://github.com/pop-os/launcher/archive/a332a3a73316a3595816dd02fe426a1d3543167a.tar.gz
+0001-overlayer-syshub-paths.patch"
+
+# Was previously a hand-rolled cross-compile env pointing at the mounted
+# ZAINIUM_DRIVE toolchain (not CI-portable). ci/build.sh already builds
+# natively inside an alpine:latest container -- x86_64-unknown-linux-musl
+# IS the host here, no cross sysroot needed -- and already exports
+# LDFLAGS/CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_RUSTFLAGS pointing at
+# Zainium's musl loader once install_toolchain_deps() has run. This
+# recipe only needs its own extra link args on top (libevdev/libmtdev,
+# from a transitive *-sys crate), same convention as every other
+# converted package.
+makedepends="cargo just libevdev-dev"
+
+build() {
+    # GitHub commit-archive extracted-dir name != $pkgname-$pkgver.
+    cd launcher-a332a3a73316a3595816dd02fe426a1d3543167a
+
+    patch -p1 < ../0001-overlayer-syshub-paths.patch
+
+    export CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_RUSTFLAGS="${CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_RUSTFLAGS:-} -C link-arg=-Wl,--allow-shlib-undefined -C link-arg=-levdev"
+
+    cargo build --release --target x86_64-unknown-linux-musl
+}
+
+package() {
+    just rootdir="$PAYLOAD_DIR" prefix=/overlayer/syshub \
+        cargo-target-dir=target/x86_64-unknown-linux-musl install
+}
