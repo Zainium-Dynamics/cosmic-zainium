@@ -64,4 +64,9 @@ package() {
 
     mkdir -p "$scriptsdir"
     cp -r scripts/. "$scriptsdir"/
+    # substrate's layout scanner blocks any /usr reference in shipped
+    # file content -- these scripts' own #!/usr/bin/env shebangs trip
+    # it, same class of issue as the .desktop Exec= lines elsewhere.
+    find "$scriptsdir" -type f -exec \
+        sed -i '1s|^#!/usr/bin/env |#!/overlayer/syshub/bin/env |' {} +
 }
