@@ -40,11 +40,18 @@ build() {
 	rustflags = ["-C", "target-feature=-crt-static"]
 	EOF
 
-    cargo build -Z host-config -Z target-applies-to-host \
-        --release --target x86_64-unknown-linux-musl
+    # No --target here: this package installs via its own Makefile
+    # (there is no justfile upstream at all -- `just install` failed
+    # with "No justfile found"), which hardcodes
+    # $(CARGO_TARGET_DIR)/$(TARGET)/$(BIN) = target/release/... with no
+    # cross-target awareness. Alpine's host toolchain already IS
+    # x86_64-unknown-linux-musl, so a plain build lands there directly.
+    cargo build -Z host-config -Z target-applies-to-host --release
 }
 
 package() {
-    just rootdir="$PAYLOAD_DIR" prefix=/overlayer/syshub \
-        cargo-target-dir=target/x86_64-unknown-linux-musl install
+    # geoclue_agent's Makefile default is a plain /usr/libexec/...
+    # literal, not derived from prefix -- override explicitly.
+    make DESTDIR="$PAYLOAD_DIR" prefix=/overlayer/syshub \
+        geoclue_agent=/overlayer/syshub/libexec/geoclue-2.0/demos/agent install
 }
