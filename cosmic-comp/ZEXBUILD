@@ -24,6 +24,8 @@ build() {
 }
 
 package() {
-	cd cosmic-comp-epoch-$pkgver
+	# Already inside cosmic-comp-epoch-$pkgver -- build() cd'd there and
+	# that cwd persists (same shell process, no subshell), cd-ing again
+	# here would look for a nested copy of the same dir name and fail.
 	make DESTDIR="$PAYLOAD_DIR" prefix=/overlayer/syshub install
 }
