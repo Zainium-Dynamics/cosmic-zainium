@@ -9,6 +9,5 @@ source="https://github.com/pop-os/cosmic-icons/archive/refs/tags/epoch-$pkgver.t
 makedepends="just"
 
 package() {
-	cd cosmic-icons-epoch-$pkgver
 	just rootdir="$PAYLOAD_DIR" prefix=/overlayer/syshub install
 }
