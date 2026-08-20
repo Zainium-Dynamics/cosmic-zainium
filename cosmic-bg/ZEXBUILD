@@ -31,7 +31,9 @@ build() {
 }
 
 package() {
-    cd cosmic-bg-epoch-1.6.0
+    # Already inside cosmic-bg-epoch-1.6.0 -- build() cd'd there and
+    # that cwd persists (same shell process), cd-ing again here looks
+    # for a nested copy of the same dir name and fails.
     just rootdir="$PAYLOAD_DIR" prefix=/overlayer/syshub \
         cargo-target-dir=target/x86_64-unknown-linux-musl install
 }
