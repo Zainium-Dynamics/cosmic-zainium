@@ -1,0 +1,19 @@
+maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
+pkgname=cosmic-panel
+pkgver=1.6.0
+pkgrel=0
+# No systemd/logind Cargo feature. TODO: sha256sums.
+source="https://github.com/pop-os/cosmic-panel/archive/refs/tags/epoch-$pkgver.tar.gz"
+
+makedepends="appstream-glib cargo desktop-file-utils findutils intltool just libxkbcommon-dev wayland-dev wayland-protocols"
+
+build() {
+	cd cosmic-panel-epoch-$pkgver
+	cargo build --release --target x86_64-unknown-linux-musl
+}
+
+package() {
+	cd cosmic-panel-epoch-$pkgver
+	just rootdir="$PAYLOAD_DIR" prefix=/overlayer/syshub \
+		cargo-target-dir=target/x86_64-unknown-linux-musl install
+}
