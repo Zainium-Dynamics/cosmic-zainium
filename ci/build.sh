@@ -145,6 +145,18 @@ export LDFLAGS="${LDFLAGS:-} -Wl,-dynamic-linker=$ZAINIUM_LDSO -Wl,-rpath=/overl
 # whole musl-native-DYNAMIC setup is for.
 export CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_RUSTFLAGS="${CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_RUSTFLAGS:-} -C target-feature=-crt-static -C relocation-model=dynamic-no-pic -C link-arg=-Wl,-dynamic-linker=$ZAINIUM_LDSO -C link-arg=-Wl,-rpath=/overlayer/syshub/lib"
 
+# NOTE: do NOT also export a bare RUSTFLAGS here. Tried that (for a
+# build-script dlopen problem, see xdg-desktop-portal-cosmic's own
+# ZEXBUILD instead) and it silently WINS over
+# CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_RUSTFLAGS for every package's
+# actual --target output too, not just host/build-script artifacts --
+# cargo does not merge the two, and RUSTFLAGS took priority here. Every
+# package's binary came out linked against the plain system loader
+# (/lib/ld-musl-x86_64.so.1) instead of Zainium's
+# (verify_musl below caught it, which is the whole point of that check
+# -- but the fix belongs in the one recipe that actually needs it, not
+# globally here).
+
 # Some builds run their own just-compiled tool mid-build (wayland's
 # wayland-scanner generating protocol headers, e.g.) — that tool now
 # carries Zainium's interpreter/rpath too, so it needs its *other*
@@ -165,7 +177,7 @@ export CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_RUSTFLAGS="${CARGO_TARGET_X86_64_U
 # libs at build time should set LD_LIBRARY_PATH to Alpine's real
 # /usr/lib:/lib in its own ZEXBUILD instead (see gnome-shell) -
 # borrows the real, fully-linked copy instead of a partial stand-in.
-for lib in libz.so.1 liblzma.so.5 libexpat.so.1 libxml2.so.2; do
+for lib in libz.so.1 liblzma.so.5 libexpat.so.1 libxml2.so.2 libgcc_s.so.1; do
     [ -e "/overlayer/syshub/lib/$lib" ] && continue
     src="$(find /usr/lib /lib -maxdepth 1 -name "$lib" 2>/dev/null | head -1)"
     [ -n "$src" ] || continue
