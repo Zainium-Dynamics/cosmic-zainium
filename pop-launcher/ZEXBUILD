@@ -31,7 +31,12 @@ build() {
 
     export CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_RUSTFLAGS="${CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_RUSTFLAGS:-} -C link-arg=-Wl,--allow-shlib-undefined -C link-arg=-levdev"
 
-    cargo build --release --target x86_64-unknown-linux-musl
+    # Root Cargo.toml is itself a package ("pop-launcher", a lib, no
+    # [[bin]]) inside a workspace whose real binary lives in bin/
+    # ("pop-launcher-bin"). Plain `cargo build` with no -p only builds
+    # the current-dir package (the root lib), never touching bin/ --
+    # need -p explicitly, matching upstream's own justfile.
+    cargo build --release --target x86_64-unknown-linux-musl -p pop-launcher-bin
 }
 
 package() {
