@@ -1,0 +1,19 @@
+maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
+pkgname=cosmic-player
+pkgver=1.6.0
+pkgrel=0
+# No systemd/logind Cargo feature. TODO: sha256sums.
+source="https://github.com/pop-os/cosmic-player/archive/refs/tags/epoch-$pkgver.tar.gz"
+
+makedepends="cargo clang-libclang glib-dev gst-plugins-base-dev gstreamer-dev just libxkbcommon-dev wayland-dev"
+
+build() {
+	cd cosmic-player-epoch-$pkgver
+	cargo build --release --target x86_64-unknown-linux-musl
+}
+
+package() {
+	cd cosmic-player-epoch-$pkgver
+	just rootdir="$PAYLOAD_DIR" prefix=/overlayer/syshub \
+		cargo-target-dir=target/x86_64-unknown-linux-musl install
+}
