@@ -1,0 +1,19 @@
+maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
+pkgname=cosmic-idle
+pkgver=1.5.0
+pkgrel=0
+# No systemd/logind Cargo feature. TODO: sha256sums.
+source="$pkgname-$pkgver.tar.gz::https://github.com/pop-os/cosmic-idle/archive/refs/tags/epoch-$pkgver.tar.gz"
+
+makedepends="cargo just libxkbcommon-dev wayland-dev"
+
+build() {
+	cd cosmic-idle-epoch-$pkgver
+	cargo build --release --target x86_64-unknown-linux-musl
+}
+
+package() {
+	cd cosmic-idle-epoch-$pkgver
+	just rootdir="$PAYLOAD_DIR" prefix=/overlayer/syshub \
+		cargo-target-dir=target/x86_64-unknown-linux-musl install
+}
