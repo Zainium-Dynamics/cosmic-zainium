@@ -1,0 +1,26 @@
+maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
+pkgname=cosmic-screenshot
+pkgver=1.5.0
+pkgrel=0
+# Commit archive at the exact pop-os/cosmic-screenshot commit pinned by
+# ~/cosmic-epoch's epoch-1.5.0 submodule set. No systemd/dbus/flatpak
+# dependency in this component's own Cargo.toml -- only patch needed is
+# real Zainium branding artwork (replaces nothing upstream, this repo
+# ships no resources/*.svg at all pristine -- these are new files).
+source="https://github.com/pop-os/cosmic-screenshot/archive/refs/tags/epoch-1.5.0.tar.gz
+9999-zainium-branding-logos.patch"
+
+sha256sums="2a0a1fb18303773fbfe54613b0b5603871a72cbbb5b0ae183b5390227671b9a3  epoch-1.5.0.tar.gz"
+
+build() {
+    cd cosmic-screenshot-epoch-1.5.0
+
+    patch -p1 < ../9999-zainium-branding-logos.patch
+
+    cargo build --release --target x86_64-unknown-linux-musl
+}
+
+package() {
+    just rootdir="$PAYLOAD_DIR" prefix=/overlayer/syshub \
+        cargo-target-dir=target/x86_64-unknown-linux-musl install
+}
