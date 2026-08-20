@@ -1,0 +1,29 @@
+maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
+pkgname=cosmic-comp
+pkgver=1.5.0
+pkgrel=0
+source="$pkgname-$pkgver.tar.gz::https://github.com/pop-os/cosmic-comp/archive/refs/tags/epoch-$pkgver.tar.gz
+0001-no-systemd-default.patch"
+
+makedepends="cargo-auditable fontconfig-dev libdisplay-info-dev libinput-dev libseat-dev libxcb-dev libxkbcommon-dev mesa-dev pixman-dev wayland-dev"
+
+build() {
+	cd cosmic-comp-epoch-$pkgver
+
+	patch -p1 < ../0001-no-systemd-default.patch
+
+	# Zainium branding: our own cosmic-*.svg logos/splash art dropped
+	# into resources/ alongside the pristine pop-*.svg files (kept, not
+	# removed) -- same non-destructive pattern as cosmic-settings'/
+	# cosmic-screenshot's 9999-zainium-branding-logos.patch, just done
+	# as a direct copy since the assets are already staged as real
+	# files here, not a diff.
+	cp -a "$RECIPE_DIR"/resources/. resources/
+
+	cargo auditable build --release --frozen --no-default-features --features logind
+}
+
+package() {
+	cd cosmic-comp-epoch-$pkgver
+	make DESTDIR="$PAYLOAD_DIR" prefix=/overlayer/syshub install
+}
