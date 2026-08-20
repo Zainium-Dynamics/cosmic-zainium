@@ -54,7 +54,11 @@ build() {
 	rustflags = ["-C", "target-feature=-crt-static"]
 	EOF
 
-    cargo build --release --target x86_64-unknown-linux-musl
+    # [host] is still an unstable cargo table -- silently does nothing
+    # without these two -Z flags, even on a nightly toolchain. That's
+    # why the config.toml above alone didn't help the first time.
+    cargo build -Z host-config -Z target-applies-to-host \
+        --release --target x86_64-unknown-linux-musl
 }
 
 package() {
