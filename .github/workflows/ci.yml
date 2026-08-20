@@ -25,15 +25,16 @@ on:
   push:
     branches: [master]
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
+  # PR validation: a stale run is worthless once new commits land on the
+  # same PR, so cancel it outright and start the fresh one immediately.
   check:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     container: alpine:latest
+    concurrency:
+      group: check-${{ github.event.pull_request.number }}
+      cancel-in-progress: true
     steps:
       - name: Container prerequisites (glibc shim for actions' Node runtime)
         run: |
@@ -155,6 +156,14 @@ jobs:
     container: alpine:latest
     permissions:
       contents: write
+    # Never cancel a release mid-build -- a killed run can leave a
+    # partial GitHub Release (some .zex attached, some not) sitting
+    # there. Each merge to master queues behind whatever's already
+    # running and starts on its own once that one finishes, same as
+    # userland-recipes/syshub-recipes.
+    concurrency:
+      group: release-master
+      cancel-in-progress: false
     steps:
       - name: Container prerequisites (glibc shim for actions' Node runtime)
         run: |
