@@ -1,0 +1,57 @@
+maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
+pkgname=cosmic-settings-daemon
+pkgver=1.6.0
+pkgrel=0
+# Commit archive at the exact pop-os/cosmic-settings-daemon commit pinned by
+# ~/cosmic-epoch's epoch-1.5.0 submodule set. Patches: systemd removed
+# from default features (code changes too, where pristine code doesn't
+# compile with systemd off) + any /usr/... path fixed to
+# /overlayer/syshub/... . No dbus/flatpak dependency exists in this
+# component's own Cargo.toml. Real tagged release + sha256sum, verified against Alpine's
+# own aports/community APKBUILD for the same package (same epoch-1.5.0
+# tag, same pop-os source).
+source="https://github.com/pop-os/cosmic-settings-daemon/archive/refs/tags/epoch-1.6.0.tar.gz
+0001-overlayer-syshub-paths.patch"
+
+sha256sums=""  # TODO: re-pin for epoch-1.6.0 (was pinned for 1.5.0)
+
+# makedepends was missing entirely -- libspa-sys/pipewire-rs needs
+# libpipewire-0.3 via pkg-config, plus the rest of the daemon's real
+# build-time C deps (brightness/input/audio backends).
+makedepends="cargo clang-libclang libinput-dev libxkbcommon-dev openssl-dev pipewire-dev pulseaudio-dev"
+
+build() {
+    # GitHub tag-archive extracted-dir name is $pkgname-epoch-$pkgver, not $pkgname-$pkgver.
+    cd cosmic-settings-daemon-epoch-1.6.0
+
+    patch -p1 < ../0001-overlayer-syshub-paths.patch
+
+    # libspa-sys (pipewire-rs) uses bindgen -> clang-sys dlopen's
+    # libclang.so from its build-script, which is a host artifact and
+    # inherits musl's static-by-default -- a static binary can't
+    # dlopen at all ("Dynamic loading not supported"). Cargo's [host]
+    # config table fixes only host-artifact rustflags without touching
+    # this package's own --target output, but it's still unstable --
+    # needs -Z host-config -Z target-applies-to-host even on nightly.
+    export LIBCLANG_PATH="$(dirname "$(find /usr/lib -name 'libclang.so*' | head -1)")"
+    mkdir -p .cargo
+    cat > .cargo/config.toml <<-'EOF'
+	[host]
+	rustflags = ["-C", "target-feature=-crt-static"]
+	EOF
+
+    # No --target here: this package installs via its own Makefile
+    # (there is no justfile upstream at all -- `just install` failed
+    # with "No justfile found"), which hardcodes
+    # $(CARGO_TARGET_DIR)/$(TARGET)/$(BIN) = target/release/... with no
+    # cross-target awareness. Alpine's host toolchain already IS
+    # x86_64-unknown-linux-musl, so a plain build lands there directly.
+    cargo build -Z host-config -Z target-applies-to-host --release
+}
+
+package() {
+    # geoclue_agent's Makefile default is a plain /usr/libexec/...
+    # literal, not derived from prefix -- override explicitly.
+    make DESTDIR="$PAYLOAD_DIR" prefix=/overlayer/syshub \
+        geoclue_agent=/overlayer/syshub/libexec/geoclue-2.0/demos/agent install
+}
