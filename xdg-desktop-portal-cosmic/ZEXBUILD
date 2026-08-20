@@ -16,6 +16,11 @@ source="https://github.com/pop-os/xdg-desktop-portal-cosmic/archive/refs/tags/ep
 
 sha256sums=""  # TODO: re-pin for epoch-1.6.0 (was pinned for 1.5.0)
 
+# makedepends was missing entirely -- glib-sys needs glib-2.0 via
+# pkg-config, plus the rest of the portal's real build-time C deps
+# (screencast/screenshot via pipewire, session bus via dbus).
+makedepends="cargo just glib-dev wayland-dev libxkbcommon-dev dbus-dev pipewire-dev mesa-dev"
+
 build() {
     # GitHub tag-archive extracted-dir name is $pkgname-epoch-$pkgver, not $pkgname-$pkgver.
     cd xdg-desktop-portal-cosmic-epoch-1.6.0
