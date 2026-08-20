@@ -2,7 +2,7 @@
 
 [package]
 name             = "cosmic-screenshot"
-version          = "1.5.0"
+version          = "1.6.0"
 description      = "COSMIC screenshot utility, systemd/dbus/flatpak free, real Zainium branding"
 license          = "GPL-3.0-only"
 maintainer       = "Ali Zain <alizain@zainiumdynamics.tech>"
