@@ -25,6 +25,10 @@ build() {
 }
 
 package() {
-    just rootdir="$PAYLOAD_DIR" prefix=/overlayer/syshub \
-        cargo-target-dir=target/x86_64-unknown-linux-musl install
+    # This justfile's variable is `targetdir` (env('CARGO_TARGET_DIR',
+    # 'target')), not `cargo-target-dir` like other components' -- every
+    # justfile here names it differently, no universal CLI arg. The env
+    # var matches where build()'s --target already put the binaries.
+    export CARGO_TARGET_DIR=target/x86_64-unknown-linux-musl
+    just rootdir="$PAYLOAD_DIR" prefix=/overlayer/syshub install
 }
