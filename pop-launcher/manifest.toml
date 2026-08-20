@@ -2,7 +2,7 @@
 
 [package]
 name             = "pop-launcher"
-version          = "1.5.0"
+version          = "1.6.0"
 description      = "pop-launcher search backend used by cosmic-launcher, systemd/dbus/flatpak free"
 license          = "GPL-3.0-only"
 maintainer       = "Ali Zain <alizain@zainiumdynamics.tech>"
