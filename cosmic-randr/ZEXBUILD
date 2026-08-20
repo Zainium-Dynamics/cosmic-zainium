@@ -1,6 +1,6 @@
 maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
 pkgname=cosmic-randr
-pkgver=1.5.0
+pkgver=1.6.0
 pkgrel=0
 # No systemd/logind Cargo feature. TODO: sha256sums.
 # ci/build.sh's fetch loop doesn't implement Alpine abuild's
@@ -15,7 +15,9 @@ build() {
 }
 
 package() {
-	cd cosmic-randr-epoch-$pkgver
+	# Already inside cosmic-randr-epoch-$pkgver -- build() cd'd there and
+	# that cwd persists (same shell process), cd-ing again here looked
+	# for a nested copy of the same dir name and failed.
 	just rootdir="$PAYLOAD_DIR" prefix=/overlayer/syshub \
 		cargo-target-dir=target/x86_64-unknown-linux-musl install
 }
