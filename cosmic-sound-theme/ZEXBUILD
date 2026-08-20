@@ -1,0 +1,19 @@
+maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
+pkgname=cosmic-sound-theme
+pkgver=1.6.0
+pkgrel=0
+# Data-only (sound theme), meson-built. TODO: sha256sums.
+source="https://github.com/pop-os/cosmic-sound-theme/archive/refs/tags/epoch-$pkgver.tar.gz"
+
+makedepends="meson"
+
+build() {
+	cd cosmic-sound-theme-epoch-$pkgver
+	meson setup output --prefix=/overlayer/syshub
+	meson compile -C output
+}
+
+package() {
+	cd cosmic-sound-theme-epoch-$pkgver
+	DESTDIR="$PAYLOAD_DIR" meson install --no-rebuild -C output
+}
