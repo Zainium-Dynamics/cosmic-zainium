@@ -1,0 +1,27 @@
+maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
+pkgname=cosmic-idle
+pkgver=1.6.0
+pkgrel=0
+# No systemd/logind Cargo feature. TODO: sha256sums.
+# Note: pinned to epoch-1.6.0, not epoch-1.5.0 like every other
+# component here -- pop-os/cosmic-idle's tag list moved ahead on its
+# own (confirmed on github.com/pop-os/cosmic-idle/releases). Also fixed
+# the source= line itself: ci/build.sh's fetch loop only recognizes a
+# bare "https://..." URL (uses the URL's own trailing path segment as
+# the filename) -- it does NOT implement Alpine abuild's
+# "destfile::URL" renaming syntax, so the old
+# "$pkgname-$pkgver.tar.gz::https://..." form fell through to the
+# local-file `cp` branch and failed with "No such file or directory".
+source="https://github.com/pop-os/cosmic-idle/archive/refs/tags/epoch-$pkgver.tar.gz"
+
+makedepends="cargo just libxkbcommon-dev wayland-dev"
+
+build() {
+	cd cosmic-idle-epoch-$pkgver
+	cargo build --release --target x86_64-unknown-linux-musl
+}
+
+package() {
+	just rootdir="$PAYLOAD_DIR" prefix=/overlayer/syshub \
+		cargo-target-dir=target/x86_64-unknown-linux-musl install
+}
