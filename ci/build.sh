@@ -145,17 +145,17 @@ export LDFLAGS="${LDFLAGS:-} -Wl,-dynamic-linker=$ZAINIUM_LDSO -Wl,-rpath=/overl
 # whole musl-native-DYNAMIC setup is for.
 export CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_RUSTFLAGS="${CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_RUSTFLAGS:-} -C target-feature=-crt-static -C relocation-model=dynamic-no-pic -C link-arg=-Wl,-dynamic-linker=$ZAINIUM_LDSO -C link-arg=-Wl,-rpath=/overlayer/syshub/lib"
 
-# Build-scripts/proc-macros are host artifacts -- cargo compiles them
-# using plain RUSTFLAGS, not CARGO_TARGET_*_RUSTFLAGS (that only covers
-# the actual --target output), so without this they fall back to the
-# toolchain's bare default for this host triple: musl's own default is
-# crt-static (fully static). A statically-linked binary can't dlopen
-# anything at all -- bindgen/clang-sys hits this as "Dynamic loading
-# not supported" when probing for libclang.so, even though the file is
-# right there. Same crt-static fix, no Zainium-loader/rpath override
-# here: these binaries only need to run on the CI host itself using
-# its own real dynamic loader, not end up in the shipped payload.
-export RUSTFLAGS="${RUSTFLAGS:-} -C target-feature=-crt-static"
+# NOTE: do NOT also export a bare RUSTFLAGS here. Tried that (for a
+# build-script dlopen problem, see xdg-desktop-portal-cosmic's own
+# ZEXBUILD instead) and it silently WINS over
+# CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_RUSTFLAGS for every package's
+# actual --target output too, not just host/build-script artifacts --
+# cargo does not merge the two, and RUSTFLAGS took priority here. Every
+# package's binary came out linked against the plain system loader
+# (/lib/ld-musl-x86_64.so.1) instead of Zainium's
+# (verify_musl below caught it, which is the whole point of that check
+# -- but the fix belongs in the one recipe that actually needs it, not
+# globally here).
 
 # Some builds run their own just-compiled tool mid-build (wayland's
 # wayland-scanner generating protocol headers, e.g.) — that tool now
