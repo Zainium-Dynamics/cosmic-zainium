@@ -25,15 +25,16 @@ on:
   push:
     branches: [master]
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
+  # PR validation: a stale run is worthless once new commits land on the
+  # same PR, so cancel it outright and start the fresh one immediately.
   check:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     container: alpine:latest
+    concurrency:
+      group: check-${{ github.event.pull_request.number }}
+      cancel-in-progress: true
     steps:
       - name: Container prerequisites (glibc shim for actions' Node runtime)
         run: |
@@ -70,8 +71,12 @@ jobs:
       # permanent, every job, both here and in release below.
       - name: Install rustup + x86_64-unknown-linux-musl target
         run: |
+          # nightly, not stable: elevate-pam/elevate-crypto (cosmic-greeter's
+          # PAM dependency) declare rust-version = 1.96, ahead of current
+          # stable (1.93.x as of writing) -- nightly is the only channel
+          # guaranteed to satisfy every crate's MSRV here.
           curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y \
-            --default-toolchain stable --target x86_64-unknown-linux-musl --profile minimal
+            --default-toolchain nightly --target x86_64-unknown-linux-musl --profile minimal
           echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
           "$HOME/.cargo/bin/rustup" target add x86_64-unknown-linux-musl
 
@@ -155,6 +160,14 @@ jobs:
     container: alpine:latest
     permissions:
       contents: write
+    # Never cancel a release mid-build -- a killed run can leave a
+    # partial GitHub Release (some .zex attached, some not) sitting
+    # there. Each merge to master queues behind whatever's already
+    # running and starts on its own once that one finishes, same as
+    # userland-recipes/syshub-recipes.
+    concurrency:
+      group: release-master
+      cancel-in-progress: false
     steps:
       - name: Container prerequisites (glibc shim for actions' Node runtime)
         run: |
@@ -178,8 +191,12 @@ jobs:
       # permanent fix for E0463, not a one-off.
       - name: Install rustup + x86_64-unknown-linux-musl target
         run: |
+          # nightly, not stable: elevate-pam/elevate-crypto (cosmic-greeter's
+          # PAM dependency) declare rust-version = 1.96, ahead of current
+          # stable (1.93.x as of writing) -- nightly is the only channel
+          # guaranteed to satisfy every crate's MSRV here.
           curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y \
-            --default-toolchain stable --target x86_64-unknown-linux-musl --profile minimal
+            --default-toolchain nightly --target x86_64-unknown-linux-musl --profile minimal
           echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
           "$HOME/.cargo/bin/rustup" target add x86_64-unknown-linux-musl
 
