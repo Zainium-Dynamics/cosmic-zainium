@@ -11,7 +11,8 @@ pkgrel=0
 # own aports/community APKBUILD for the same package (same epoch-1.5.0
 # tag, same pop-os source).
 source="https://github.com/pop-os/cosmic-launcher/archive/refs/tags/epoch-1.6.0.tar.gz
-0001-no-desktop-systemd-scope.patch"
+0001-no-desktop-systemd-scope.patch
+0002-libcosmic-desktop-feature.patch"
 
 sha256sums=""  # TODO: re-pin for epoch-1.6.0 (was pinned for 1.5.0)
 
@@ -20,6 +21,11 @@ build() {
     cd cosmic-launcher-epoch-1.6.0
 
     patch -p1 < ../0001-no-desktop-systemd-scope.patch
+    # libcosmic is pulled unpinned (git, no rev) -- its current HEAD
+    # gates cosmic::desktop::spawn_desktop_exec/load_desktop_file
+    # behind a "desktop" feature this crate's own Cargo.toml never
+    # enabled. Same real upstream gap as cosmic-osd.
+    patch -p1 < ../0002-libcosmic-desktop-feature.patch
 
     cargo build --release --target x86_64-unknown-linux-musl
 }
