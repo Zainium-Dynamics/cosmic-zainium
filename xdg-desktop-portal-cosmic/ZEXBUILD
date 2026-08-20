@@ -19,7 +19,11 @@ sha256sums=""  # TODO: re-pin for epoch-1.6.0 (was pinned for 1.5.0)
 # makedepends was missing entirely -- glib-sys needs glib-2.0 via
 # pkg-config, plus the rest of the portal's real build-time C deps
 # (screencast/screenshot via pipewire, session bus via dbus).
-makedepends="cargo just glib-dev wayland-dev libxkbcommon-dev dbus-dev pipewire-dev mesa-dev"
+# clang-libclang: libspa-sys (pipewire-rs) uses bindgen, which dlopen's
+# libclang.so at runtime -- Alpine's llvm/clang packages only ship the
+# fully-versioned libclang.so.N.N.N by default, clang-libclang is the
+# one that actually provides the loadable libclang.so.
+makedepends="cargo just glib-dev wayland-dev libxkbcommon-dev dbus-dev pipewire-dev mesa-dev clang-libclang"
 
 build() {
     # GitHub tag-archive extracted-dir name is $pkgname-epoch-$pkgver, not $pkgname-$pkgver.
@@ -27,6 +31,10 @@ build() {
 
     patch -p1 < ../0001-no-systemd-default.patch
     patch -p1 < ../0002-overlayer-syshub-path.patch
+
+    # bindgen's clang-sys dlopen's this by soname; point it at wherever
+    # clang-libclang actually put it rather than trust auto-detection.
+    export LIBCLANG_PATH="$(dirname "$(find /usr/lib -name 'libclang.so*' | head -1)")"
 
 
     cargo build --release --target x86_64-unknown-linux-musl
