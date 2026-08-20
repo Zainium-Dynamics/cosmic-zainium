@@ -1,12 +1,12 @@
-# manifest.toml — cosmic-screenshot (syshub tier)
+# manifest.toml — cosmic-bg (syshub tier)
 
 [package]
-name             = "cosmic-screenshot"
-version          = "1.6.0"
-description      = "COSMIC screenshot utility, systemd/dbus/flatpak free, real Zainium branding"
-license          = "GPL-3.0-only"
+name             = "cosmic-bg"
+version          = "1.5.0"
+description      = "COSMIC wallpaper daemon, systemd/dbus/flatpak free"
+license          = "MPL-2.0"
 maintainer       = "Ali Zain <alizain@zainiumdynamics.tech>"
-homepage         = "https://github.com/pop-os/cosmic-screenshot"
+homepage         = "https://github.com/pop-os/cosmic-bg"
 build_type       = "dynamic"
 libc_target      = "musl"
 
@@ -15,7 +15,7 @@ ed25519_sig      = ""
 ed25519_pubkey   = ""
 
 depends          = []
-provides         = ["cosmic-screenshot"]
+provides         = ["cosmic-bg"]
 tags             = ["desktop", "cosmic"]
 
 [install]
