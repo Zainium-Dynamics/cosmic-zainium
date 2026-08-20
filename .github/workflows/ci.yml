@@ -70,8 +70,12 @@ jobs:
       # permanent, every job, both here and in release below.
       - name: Install rustup + x86_64-unknown-linux-musl target
         run: |
+          # nightly, not stable: elevate-pam/elevate-crypto (cosmic-greeter's
+          # PAM dependency) declare rust-version = 1.96, ahead of current
+          # stable (1.93.x as of writing) -- nightly is the only channel
+          # guaranteed to satisfy every crate's MSRV here.
           curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y \
-            --default-toolchain stable --target x86_64-unknown-linux-musl --profile minimal
+            --default-toolchain nightly --target x86_64-unknown-linux-musl --profile minimal
           echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
           "$HOME/.cargo/bin/rustup" target add x86_64-unknown-linux-musl
 
@@ -178,8 +182,12 @@ jobs:
       # permanent fix for E0463, not a one-off.
       - name: Install rustup + x86_64-unknown-linux-musl target
         run: |
+          # nightly, not stable: elevate-pam/elevate-crypto (cosmic-greeter's
+          # PAM dependency) declare rust-version = 1.96, ahead of current
+          # stable (1.93.x as of writing) -- nightly is the only channel
+          # guaranteed to satisfy every crate's MSRV here.
           curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y \
-            --default-toolchain stable --target x86_64-unknown-linux-musl --profile minimal
+            --default-toolchain nightly --target x86_64-unknown-linux-musl --profile minimal
           echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
           "$HOME/.cargo/bin/rustup" target add x86_64-unknown-linux-musl
 

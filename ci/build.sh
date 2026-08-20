@@ -165,7 +165,7 @@ export CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_RUSTFLAGS="${CARGO_TARGET_X86_64_U
 # libs at build time should set LD_LIBRARY_PATH to Alpine's real
 # /usr/lib:/lib in its own ZEXBUILD instead (see gnome-shell) -
 # borrows the real, fully-linked copy instead of a partial stand-in.
-for lib in libz.so.1 liblzma.so.5 libexpat.so.1 libxml2.so.2; do
+for lib in libz.so.1 liblzma.so.5 libexpat.so.1 libxml2.so.2 libgcc_s.so.1; do
     [ -e "/overlayer/syshub/lib/$lib" ] && continue
     src="$(find /usr/lib /lib -maxdepth 1 -name "$lib" 2>/dev/null | head -1)"
     [ -n "$src" ] || continue
