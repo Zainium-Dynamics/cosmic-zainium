@@ -145,6 +145,18 @@ export LDFLAGS="${LDFLAGS:-} -Wl,-dynamic-linker=$ZAINIUM_LDSO -Wl,-rpath=/overl
 # whole musl-native-DYNAMIC setup is for.
 export CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_RUSTFLAGS="${CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_RUSTFLAGS:-} -C target-feature=-crt-static -C relocation-model=dynamic-no-pic -C link-arg=-Wl,-dynamic-linker=$ZAINIUM_LDSO -C link-arg=-Wl,-rpath=/overlayer/syshub/lib"
 
+# Build-scripts/proc-macros are host artifacts -- cargo compiles them
+# using plain RUSTFLAGS, not CARGO_TARGET_*_RUSTFLAGS (that only covers
+# the actual --target output), so without this they fall back to the
+# toolchain's bare default for this host triple: musl's own default is
+# crt-static (fully static). A statically-linked binary can't dlopen
+# anything at all -- bindgen/clang-sys hits this as "Dynamic loading
+# not supported" when probing for libclang.so, even though the file is
+# right there. Same crt-static fix, no Zainium-loader/rpath override
+# here: these binaries only need to run on the CI host itself using
+# its own real dynamic loader, not end up in the shipped payload.
+export RUSTFLAGS="${RUSTFLAGS:-} -C target-feature=-crt-static"
+
 # Some builds run their own just-compiled tool mid-build (wayland's
 # wayland-scanner generating protocol headers, e.g.) — that tool now
 # carries Zainium's interpreter/rpath too, so it needs its *other*
