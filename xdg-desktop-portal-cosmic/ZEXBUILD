@@ -36,6 +36,23 @@ build() {
     # clang-libclang actually put it rather than trust auto-detection.
     export LIBCLANG_PATH="$(dirname "$(find /usr/lib -name 'libclang.so*' | head -1)")"
 
+    # Build-script/proc-macro binaries (host artifacts) inherit musl's
+    # bare default of crt-static (fully static) unless told otherwise,
+    # and a static binary can't dlopen anything -- bindgen/clang-sys
+    # hits this as "Dynamic loading not supported" even with
+    # LIBCLANG_PATH set correctly. Cargo's [host] config table is the
+    # correct, scoped way to fix only host-artifact flags -- unlike a
+    # bare RUSTFLAGS env var, it does NOT also override
+    # CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_RUSTFLAGS for this
+    # package's own --target output (that broke musl-loader linking
+    # for every package the one time this was tried as a global
+    # RUSTFLAGS export in ci/build.sh instead -- see that file's own
+    # comment on why it's not there anymore).
+    mkdir -p .cargo
+    cat > .cargo/config.toml <<-'EOF'
+	[host]
+	rustflags = ["-C", "target-feature=-crt-static"]
+	EOF
 
     cargo build --release --target x86_64-unknown-linux-musl
 }
