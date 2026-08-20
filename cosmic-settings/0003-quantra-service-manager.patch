@@ -1,0 +1,110 @@
+--- a/cosmic-settings/src/service_manager.rs
++++ b/cosmic-settings/src/service_manager.rs
+@@ -290,6 +290,84 @@
+     }
+ }
+ 
++/// Quantra implementation of ServiceManager (Zainium OS).
++///
++/// Shells out to `quantra-ctl`, the CLI for quantra's PID 1 control
++/// socket (`/run/quantra/control`) -- neither systemd nor OpenRC exist
++/// on Zainium, so this is the actual service manager in play there.
++#[cfg(feature = "quantra")]
++pub struct QuantraServiceManager {
++    service_name: String,
++}
++
++#[cfg(feature = "quantra")]
++impl QuantraServiceManager {
++    pub fn new(service_name: impl Into<String>) -> Self {
++        Self {
++            service_name: service_name.into(),
++        }
++    }
++}
++
++#[cfg(feature = "quantra")]
++impl ServiceManager for QuantraServiceManager {
++    fn is_enabled(&self) -> bool {
++        // quantra's own on-disk convention: a service is enabled iff a
++        // marker file for it exists under .../enabled/ -- no command
++        // needed, this is exactly what quantra-ctl itself reads.
++        std::path::Path::new("/overlayer/syshub/etc/quantra-system/enabled")
++            .join(&self.service_name)
++            .exists()
++    }
++
++    fn is_active(&self) -> bool {
++        // `quantra-ctl is-started <service>` mirrors its process exit
++        // code from the daemon's own response (0 = started), same
++        // exit-code convention as `rc-service status`/`systemctl is-active`.
++        std::process::Command::new("quantra-ctl")
++            .args(["is-started", &self.service_name])
++            .status()
++            .map(|status| status.success())
++            .unwrap_or(true)
++    }
++
++    fn activate(&self) -> Pin<Box<dyn Future<Output = ()> + Send>> {
++        let service = self.service_name.clone();
++        Box::pin(async move {
++            run_pkexec_command(
++                &["quantra-ctl", "start", &service],
++                "quantra-ctl start",
++                &service,
++            )
++            .await;
++        })
++    }
++
++    fn enable(&self) -> Pin<Box<dyn Future<Output = ()> + Send>> {
++        let service = self.service_name.clone();
++        Box::pin(async move {
++            run_pkexec_command(
++                &["quantra-ctl", "enable", &service],
++                "quantra-ctl enable",
++                &service,
++            )
++            .await;
++            run_pkexec_command(
++                &["quantra-ctl", "start", &service],
++                "quantra-ctl start",
++                &service,
++            )
++            .await;
++        })
++    }
++
++    fn is_installed(&self) -> bool {
++        std::path::Path::new("/overlayer/syshub/etc/quantra-system/services")
++            .join(format!("{}.toml", self.service_name))
++            .exists()
++    }
++}
++
+ /// Detect the running service manager and create a manager for the named service.
+ ///
+ /// Checks runtime directories (`/run/systemd/system`, `/run/openrc`) to determine
+@@ -317,12 +395,22 @@
+         }
+     }
+ 
++    #[cfg(feature = "quantra")]
++    {
++        if std::path::Path::new("/run/quantra/control").exists() {
++            tracing::debug!("Detected quantra service manager via /run/quantra/control");
++            return Ok(Box::new(QuantraServiceManager::new(service_name)));
++        }
++    }
++
+     {
+         let mut checked = Vec::new();
+         #[cfg(feature = "systemd")]
+         checked.push("systemd (/run/systemd/system)");
+         #[cfg(feature = "openrc")]
+         checked.push("openrc (/run/openrc)");
++        #[cfg(feature = "quantra")]
++        checked.push("quantra (/run/quantra/control)");
+ 
+         Err(format!(
+             "Could not detect a running service manager. Checked for: {}. \
