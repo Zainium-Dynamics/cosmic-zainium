@@ -14,6 +14,7 @@ source="https://github.com/pop-os/cosmic-settings/archive/refs/tags/epoch-1.6.0.
 0001-no-systemd-default.patch
 0002-overlayer-syshub-paths.patch
 0003-quantra-service-manager.patch
+0004-quantra-feature-gate.patch
 9999-zainium-branding-logos.patch"
 
 sha256sums=""  # TODO: re-pin for epoch-1.6.0 (was pinned for 1.5.0)
@@ -40,6 +41,12 @@ build() {
     # resources/{cosmic,pop}-*.svg filenames a distributor logo lookup
     # would use. New files -- pristine upstream ships no resources/*.svg.
     patch -p1 < ../9999-zainium-branding-logos.patch
+    # src/main.rs has its own compile_error!() gate that only knew
+    # "systemd"/"openrc" -- built fine with 0001/0003 applied and
+    # --features quantra, but that static check still fired ("At least
+    # one service manager feature must be enabled") since it never
+    # heard of "quantra". Widen the gate.
+    patch -p1 < ../0004-quantra-feature-gate.patch
 
     # quantra feature: src/service_manager.rs's QuantraServiceManager
     # (quantra-ctl start/stop/enable/disable/is-started), used in place
