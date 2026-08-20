@@ -18,6 +18,5 @@ build() {
 }
 
 package() {
-	cd cosmic-workspaces-epoch-epoch-$pkgver
 	make DESTDIR="$PAYLOAD_DIR" prefix=/overlayer/syshub install
 }
