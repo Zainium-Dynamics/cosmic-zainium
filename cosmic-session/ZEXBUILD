@@ -1,0 +1,40 @@
+maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
+pkgname=cosmic-session
+pkgver=1.6.0
+pkgrel=0
+# Commit archive at the exact pop-os/cosmic-session commit pinned by
+# ~/cosmic-epoch's epoch-1.5.0 submodule set. Patches: systemd removed
+# from default features (code changes too, where pristine code doesn't
+# compile with systemd off) + any /usr/... path fixed to
+# /overlayer/syshub/... . No dbus/flatpak dependency exists in this
+# component's own Cargo.toml. Real tagged release + sha256sum, verified against Alpine's
+# own aports/community APKBUILD for the same package (same epoch-1.5.0
+# tag, same pop-os source).
+source="https://github.com/pop-os/cosmic-session/archive/refs/tags/epoch-1.6.0.tar.gz
+0001-no-systemd-default.patch
+0002-no-hard-systemd-dependency.patch
+0003-overlayer-syshub-path.patch
+0004-desktop-file-path.patch"
+
+sha256sums=""  # TODO: re-pin for epoch-1.6.0 (was pinned for 1.5.0)
+
+build() {
+    # GitHub tag-archive extracted-dir name is $pkgname-epoch-$pkgver, not $pkgname-$pkgver.
+    cd cosmic-session-epoch-1.6.0
+
+    patch -p1 < ../0001-no-systemd-default.patch
+    patch -p1 < ../0002-no-hard-systemd-dependency.patch
+    patch -p1 < ../0003-overlayer-syshub-path.patch
+    # data/cosmic.desktop's Exec= line was still a literal /usr/bin/...
+    # -- substrate's own packer blocks any /usr reference found in
+    # shipped file content, this isn't optional cleanup.
+    patch -p1 < ../0004-desktop-file-path.patch
+
+
+    cargo build --release --target x86_64-unknown-linux-musl
+}
+
+package() {
+    just rootdir="$PAYLOAD_DIR" prefix=/overlayer/syshub \
+        cargo-target-dir=target/x86_64-unknown-linux-musl install
+}
