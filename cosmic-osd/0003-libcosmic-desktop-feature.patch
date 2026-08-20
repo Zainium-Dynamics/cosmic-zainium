@@ -1,0 +1,10 @@
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -20,6 +20,7 @@ libcosmic = { git = "https://github.com/pop-os/libcosmic", default-features =
+     "autosize",
+     "dbus-config",
+     "desktop-systemd-scope",
++    "desktop",
+     "tokio",
+     "wayland",
+     "multi-window",

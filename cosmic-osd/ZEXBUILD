@@ -12,7 +12,8 @@ pkgrel=0
 # tag, same pop-os source).
 source="https://github.com/pop-os/cosmic-osd/archive/refs/tags/epoch-1.6.0.tar.gz
 0001-no-desktop-systemd-scope.patch
-0002-overlayer-syshub-path.patch"
+0002-overlayer-syshub-path.patch
+0003-libcosmic-desktop-feature.patch"
 
 sha256sums=""  # TODO: re-pin for epoch-1.6.0 (was pinned for 1.5.0)
 
@@ -22,6 +23,11 @@ build() {
 
     patch -p1 < ../0001-no-desktop-systemd-scope.patch
     patch -p1 < ../0002-overlayer-syshub-path.patch
+    # libcosmic is pulled unpinned (git = "...", no rev) -- its current
+    # HEAD gates cosmic::desktop::spawn_desktop_exec behind a "desktop"
+    # feature that cosmic-osd's own Cargo.toml never enabled. Real
+    # upstream gap, not a Zainium-specific issue.
+    patch -p1 < ../0003-libcosmic-desktop-feature.patch
 
     cargo build --release --target x86_64-unknown-linux-musl
 }
