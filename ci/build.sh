@@ -135,7 +135,15 @@ install_toolchain_deps
 # musl is real now (just unpacked above) — safe to point every
 # recipe's LDFLAGS/RUSTFLAGS at Zainium's actual loader.
 export LDFLAGS="${LDFLAGS:-} -Wl,-dynamic-linker=$ZAINIUM_LDSO -Wl,-rpath=/overlayer/syshub/lib"
-export CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_RUSTFLAGS="${CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_RUSTFLAGS:-} -C link-arg=-Wl,-dynamic-linker=$ZAINIUM_LDSO -C link-arg=-Wl,-rpath=/overlayer/syshub/lib"
+# rustup's stock x86_64-unknown-linux-musl target defaults to fully
+# static (-static-pie) unless told otherwise -- without
+# target-feature=-crt-static, rustc tries to statically link every C
+# lib a crate pulls in too (wayland, xkbcommon, ...), and Alpine's own
+# -dev packages only ship the shared .so, not a static .a, so the link
+# fails with "cannot find -lxkbcommon" (or whatever lib) instead of
+# actually producing the dynamic, Zainium-loader-linked binary this
+# whole musl-native-DYNAMIC setup is for.
+export CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_RUSTFLAGS="${CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_RUSTFLAGS:-} -C target-feature=-crt-static -C relocation-model=dynamic-no-pic -C link-arg=-Wl,-dynamic-linker=$ZAINIUM_LDSO -C link-arg=-Wl,-rpath=/overlayer/syshub/lib"
 
 # Some builds run their own just-compiled tool mid-build (wayland's
 # wayland-scanner generating protocol headers, e.g.) — that tool now
@@ -280,7 +288,11 @@ done
 cd "$pkgname-$pkgver" 2>/dev/null || true
 
 # ── build ──────────────────────────────────────────────────────────────
-build
+# Data-only recipes (icons, wallpapers, sound themes, ...) legitimately
+# have no build() -- only package(). Calling the bare word `build`
+# unconditionally fails with "build: not found" for those; only call it
+# if the recipe actually defined it.
+command -v build >/dev/null 2>&1 && build
 
 # ── package: main payload ─────────────────────────────────────────────
 PAYLOAD_DIR="$STAGING_ROOT/pkg/payload"
