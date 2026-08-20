@@ -12,6 +12,5 @@ pkgrel=0
 source="https://github.com/pop-os/cosmic-wallpapers/archive/refs/tags/epoch-$pkgver.tar.gz"
 
 package() {
-	cd cosmic-wallpapers-epoch-$pkgver
 	make DESTDIR="$PAYLOAD_DIR" prefix=/overlayer/syshub install
 }
