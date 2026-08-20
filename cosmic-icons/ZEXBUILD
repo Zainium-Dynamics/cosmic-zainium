@@ -1,0 +1,14 @@
+maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
+pkgname=cosmic-icons
+pkgver=1.6.0
+pkgrel=0
+# Data-only (icon theme) -- no cargo build, no systemd/path concerns.
+# TODO: sha256sums.
+source="https://github.com/pop-os/cosmic-icons/archive/refs/tags/epoch-$pkgver.tar.gz"
+
+makedepends="just"
+
+package() {
+	cd cosmic-icons-epoch-$pkgver
+	just rootdir="$PAYLOAD_DIR" prefix=/overlayer/syshub install
+}
