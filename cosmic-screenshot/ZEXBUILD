@@ -1,0 +1,28 @@
+maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
+pkgname=cosmic-screenshot
+pkgver=1.6.0
+pkgrel=0
+# Commit archive at the exact pop-os/cosmic-screenshot commit pinned by
+# ~/cosmic-epoch's epoch-1.5.0 submodule set. No systemd/dbus/flatpak
+# dependency in this component's own Cargo.toml, no path patches needed
+# either. The old 9999-zainium-branding-logos.patch that used to sit
+# here was dead weight -- nothing in this crate's source references
+# resources/cosmic-*.svg or any login/splash logo at all (verified:
+# zero hits); it was mechanically copied from the same branding bundle
+# cosmic-settings/cosmic-comp genuinely need (they have real
+# login/splash UI, this is just a screenshot tool) and added nothing
+# but 1.5MB of unused base64 image data to the payload.
+source="https://github.com/pop-os/cosmic-screenshot/archive/refs/tags/epoch-$pkgver.tar.gz"
+
+sha256sums=""  # TODO: re-pin for epoch-1.6.0 (was pinned for 1.5.0)
+
+build() {
+    cd cosmic-screenshot-epoch-$pkgver
+
+    cargo build --release --target x86_64-unknown-linux-musl
+}
+
+package() {
+    just rootdir="$PAYLOAD_DIR" prefix=/overlayer/syshub \
+        cargo-target-dir=target/x86_64-unknown-linux-musl install
+}
