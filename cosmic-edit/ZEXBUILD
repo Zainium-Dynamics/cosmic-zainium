@@ -1,0 +1,23 @@
+maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
+pkgname=cosmic-edit
+pkgver=1.6.0
+pkgrel=0
+# No systemd/logind Cargo feature in this component -- text editor,
+# no session/power/bus integration. TODO: sha256sums once fetched once
+# in CI (see pop-launcher for the same not-yet-pinned convention).
+source="https://github.com/pop-os/cosmic-edit/archive/refs/tags/epoch-$pkgver.tar.gz"
+
+makedepends="cargo glib-dev just libxkbcommon-dev oniguruma-dev wayland-dev"
+
+build() {
+	cd cosmic-edit-epoch-$pkgver
+	export VERGEN_GIT_COMMIT_DATE="$(date -u '+%Y-%m-%d')"
+	export VERGEN_GIT_SHA="unknown"
+	cargo build --release --target x86_64-unknown-linux-musl
+}
+
+package() {
+	cd cosmic-edit-epoch-$pkgver
+	just rootdir="$PAYLOAD_DIR" prefix=/overlayer/syshub \
+		cargo-target-dir=target/x86_64-unknown-linux-musl install
+}
