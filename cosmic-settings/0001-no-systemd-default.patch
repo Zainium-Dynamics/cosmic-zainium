@@ -2,7 +2,7 @@
 +++ b/cosmic-settings/Cargo.toml
 @@ -111,8 +111,9 @@
  optional = true
-
+ 
  [features]
 -default = ["a11y", "avif", "linux", "single-instance", "wgpu", "systemd"]
 +default = ["a11y", "avif", "linux", "single-instance", "wgpu"]
@@ -11,3 +11,4 @@
  systemd = []
  openrc = []
 +quantra = []
+ 
