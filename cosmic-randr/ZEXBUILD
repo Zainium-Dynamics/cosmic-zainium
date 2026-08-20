@@ -3,7 +3,9 @@ pkgname=cosmic-randr
 pkgver=1.5.0
 pkgrel=0
 # No systemd/logind Cargo feature. TODO: sha256sums.
-source="$pkgname-$pkgver.tar.gz::https://github.com/pop-os/cosmic-randr/archive/refs/tags/epoch-$pkgver.tar.gz"
+# ci/build.sh's fetch loop doesn't implement Alpine abuild's
+# "destfile::URL" renaming syntax -- bare URL only.
+source="https://github.com/pop-os/cosmic-randr/archive/refs/tags/epoch-$pkgver.tar.gz"
 
 makedepends="cargo just"
 
