@@ -1,15 +1,13 @@
 # cosmic-zainium
 
 COSMIC desktop recipes for Zainium OS. Same `ZEXBUILD` + `manifest.toml`
-format as `syshub-recipes`, `userland-recipes`, and `gnome-desktop`.
+format as `syshub-recipes`, `userland-recipes`.
 `ci/build.sh`/`ci/changed-packages.sh` are copied unmodified from there.
 
 Upstream source: `pop-os/cosmic-epoch` (mirrored at `~/cosmic-epoch`),
 tracking its `epoch-*` tags per component.
 
 ## Status
-
-Work in progress, staged locally before it goes into `userland-recipes`.
 
 ## No systemd, no Linux-PAM
 
@@ -32,14 +30,6 @@ Work in progress, staged locally before it goes into `userland-recipes`.
 
 Everything installs under `--prefix=/overlayer/syshub`, not `/usr`.
 
-## Known gaps
-
-- No sha256sums yet on most sources — need one real fetch in CI to pin them.
-- `greetd` has no ZEXBUILD here yet (cosmic-greeter depends on it, external).
-- `hostname1`/`timedate1`/`locale1` are written (`quantra-logind/src/hostname_timedate_locale.rs`)
-  but not committed/pushed yet, so `quantra-logind`'s ZEXBUILD (pinned to
-  an older commit) doesn't include them until that lands.
-- Nothing here has actually been built in CI yet.
 
 ## Packages
 
@@ -73,8 +63,3 @@ Everything installs under `--prefix=/overlayer/syshub`, not `/usr`.
 | `cosmic-workspaces-epoch` | |
 | `pop-launcher` | path patch |
 | `xdg-desktop-portal-cosmic` | systemd off, path patch |
-| `quantra` | syshub tier, PID 1 |
-| `quantra-logind` | syshub tier, login1 |
-| `quantra-net` | syshub tier, network stack |
-| `oxibus-daemon` | syshub tier, dbus replacement |
-| `elevate-pam` | syshub tier, PAM modules |
