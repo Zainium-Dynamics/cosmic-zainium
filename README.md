@@ -57,8 +57,6 @@ Everything installs under `--prefix=/overlayer/syshub`, not `/usr`.
 | `cosmic-settings` | systemd off, real QuantraServiceManager (quantra-ctl) |
 | `cosmic-settings-daemon` | path patch |
 | `cosmic-sound-theme` | |
-| `cosmic-store` | |
-| `cosmic-term` | |
 | `cosmic-wallpapers` | |
 | `cosmic-workspaces-epoch` | |
 | `pop-launcher` | path patch |
