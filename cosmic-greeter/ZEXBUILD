@@ -43,7 +43,6 @@ build() {
 }
 
 package() {
-    cd cosmic-greeter-epoch-1.6.0
     just rootdir="$PAYLOAD_DIR" prefix=/overlayer/syshub \
         cargo-target-dir=target/x86_64-unknown-linux-musl install
 
