@@ -31,4 +31,5 @@ package() {
     # var matches where build()'s --target already put the binaries.
     export CARGO_TARGET_DIR=target/x86_64-unknown-linux-musl
     just rootdir="$PAYLOAD_DIR" prefix=/overlayer/syshub install
+    rm -rf "$PAYLOAD_DIR"/overlayer/syshub/lib/systemd  # no systemd units shipped, ever
 }
