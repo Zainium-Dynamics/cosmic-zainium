@@ -18,6 +18,7 @@ source="https://github.com/pop-os/cosmic-greeter/archive/refs/tags/epoch-1.6.0.t
 0002-daemon-no-systemd-default.patch
 0003-overlayer-syshub-path.patch
 0004-elevate-pam-integration.patch
+0006-start-script-syshub-path.patch
 cosmic-greeter.elevate-pam.toml
 cosmic-greeter-daemon.quantra.toml
 cosmic-greeter.quantra.toml"
@@ -38,6 +39,8 @@ build() {
     patch -p1 < ../0002-daemon-no-systemd-default.patch
     patch -p1 < ../0003-overlayer-syshub-path.patch
     patch -p1 < ../0004-elevate-pam-integration.patch
+    # cosmic-greeter-start.sh execed bare "cosmic-comp" via PATH, unfindable on Zainium
+    patch -p1 < ../0006-start-script-syshub-path.patch
 
     # --workspace is required: the root Cargo.toml is itself the
     # cosmic-greeter package AND a workspace with the "daemon" member.
