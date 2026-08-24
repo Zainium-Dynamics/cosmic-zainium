@@ -10,7 +10,8 @@ pkgrel=0
 # component's own Cargo.toml. No sha256sums yet (added once the source
 # URL is final).
 source="https://github.com/pop-os/launcher/archive/a332a3a73316a3595816dd02fe426a1d3543167a.tar.gz
-0001-overlayer-syshub-paths.patch"
+0001-overlayer-syshub-paths.patch
+0002-terminal-plugin-syshub-fallback.patch"
 
 # Was previously a hand-rolled cross-compile env pointing at the mounted
 # ZAINIUM_DRIVE toolchain (not CI-portable). ci/build.sh already builds
@@ -28,6 +29,8 @@ build() {
     cd launcher-a332a3a73316a3595816dd02fe426a1d3543167a
 
     patch -p1 < ../0001-overlayer-syshub-paths.patch
+    # terminal plugin's last-resort fallback still hardcoded /usr paths
+    patch -p1 < ../0002-terminal-plugin-syshub-fallback.patch
 
     export CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_RUSTFLAGS="${CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_RUSTFLAGS:-} -C link-arg=-Wl,--allow-shlib-undefined -C link-arg=-levdev"
 
