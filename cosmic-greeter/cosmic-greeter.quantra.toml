@@ -1,0 +1,16 @@
+# quantra service unit -- installed to
+# /overlayer/syshub/etc/quantra-system/services/cosmic-greeter.toml.
+# `launcher = true` defers this to quantra's post-boot launcher phase
+# (the same field the Service struct's docs call out for "display
+# managers or other graphical bridges"). greetd itself is an external
+# dependency, not yet packaged/relocated to /overlayer/syshub in this
+# repo -- TODO once a greetd ZEXBUILD exists here; command below
+# assumes it lands at /overlayer/syshub/sbin/greetd to match every
+# other package's prefix.
+name = "cosmic-greeter"
+description = "COSMIC Greeter (greetd display manager)"
+command = "/overlayer/syshub/sbin/greetd"
+args = ["--config", "/overlayer/syshub/etc/greetd/cosmic-greeter.toml"]
+launcher = true
+restart = "always"
+dependencies = ["cosmic-greeter-daemon"]

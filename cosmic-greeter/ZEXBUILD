@@ -1,0 +1,65 @@
+maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
+pkgname=cosmic-greeter
+pkgver=1.6.0
+pkgrel=0
+# Commit archive at the exact pop-os/cosmic-greeter commit pinned by
+# ~/cosmic-epoch's epoch-1.5.0 submodule set. Patches 0001/0004: real,
+# already-verified integration pulled from ZAINIUM_DRIVE/cosmic's
+# elevate-pam-patched cosmic-greeter checkout (diffed against pristine
+# cosmic-epoch) -- swaps the pam-client crate for a direct `elevate-pam`
+# git dependency (features "std,dynload,elevate_crypto") and rewrites
+# src/locker.rs's PAM calls onto elevate_pam::appl::PamBuilder /
+# elevate_pam::conv::Converser. Per ZAINIUM-QUANTRA-STACK-AUDIT.md:
+# elevate-pam does password auth only -- session open/close is quantra-
+# logind's job (JSON control socket + login1 D-Bus), no PAM session
+# module involved, pam.d and pam_quantra.so are fully removed.
+source="https://github.com/pop-os/cosmic-greeter/archive/refs/tags/epoch-1.6.0.tar.gz
+0001-main-no-systemd-default-and-elevate-pam.patch
+0002-daemon-no-systemd-default.patch
+0003-overlayer-syshub-path.patch
+0004-elevate-pam-integration.patch
+cosmic-greeter.elevate-pam.toml
+cosmic-greeter-daemon.quantra.toml
+cosmic-greeter.quantra.toml"
+
+sha256sums=""  # TODO: re-pin for epoch-1.6.0 (was pinned for 1.5.0)
+
+# Build-time: cargo fetches the elevate-pam crate straight from its
+# GitLab git remote (network access, same as any other cargo git dep --
+# no linux-pam-dev/libpam needed at all anymore, real Linux-PAM is fully
+# out of the picture, build- and run-time both).
+makedepends="cargo just eudev-dev libinput-dev libseat-dev libxkbcommon-dev wayland-dev dav1d-dev"
+
+build() {
+    # GitHub tag-archive extracted-dir name is $pkgname-epoch-$pkgver, not $pkgname-$pkgver.
+    cd cosmic-greeter-epoch-1.6.0
+
+    patch -p1 < ../0001-main-no-systemd-default-and-elevate-pam.patch
+    patch -p1 < ../0002-daemon-no-systemd-default.patch
+    patch -p1 < ../0003-overlayer-syshub-path.patch
+    patch -p1 < ../0004-elevate-pam-integration.patch
+
+    # --workspace is required: the root Cargo.toml is itself the
+    # cosmic-greeter package AND a workspace with the "daemon" member.
+    # Plain `cargo build` only builds the root package -- cosmic-greeter-
+    # daemon gets pulled in as a lib dependency (its rlib compiles fine)
+    # but its own src/main.rs binary target is skipped, which is what
+    # `just install-debian` actually installs.
+    cargo build --release --workspace --target x86_64-unknown-linux-musl
+}
+
+package() {
+    just rootdir="$PAYLOAD_DIR" prefix=/overlayer/syshub \
+        cargo-target-dir=target/x86_64-unknown-linux-musl install
+
+    install -Dm644 cosmic-greeter.toml "$PAYLOAD_DIR"/overlayer/syshub/etc/greetd/cosmic-greeter.toml
+    install -Dm644 "$RECIPE_DIR"/cosmic-greeter.elevate-pam.toml \
+        "$PAYLOAD_DIR"/overlayer/syshub/etc/elevate-pam/services/cosmic-greeter.toml
+
+    # quantra service units (no systemd units, no OpenRC .initd scripts --
+    # quantra is Zainium's own PID1, it doesn't read either of those).
+    install -Dm644 "$RECIPE_DIR"/cosmic-greeter-daemon.quantra.toml \
+        "$PAYLOAD_DIR"/overlayer/syshub/etc/quantra-system/services/cosmic-greeter-daemon.toml
+    install -Dm644 "$RECIPE_DIR"/cosmic-greeter.quantra.toml \
+        "$PAYLOAD_DIR"/overlayer/syshub/etc/quantra-system/services/cosmic-greeter.toml
+}
