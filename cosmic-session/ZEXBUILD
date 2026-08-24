@@ -37,4 +37,5 @@ build() {
 package() {
     just rootdir="$PAYLOAD_DIR" prefix=/overlayer/syshub \
         cargo-target-dir=target/x86_64-unknown-linux-musl install
+    rm -rf "$PAYLOAD_DIR"/overlayer/syshub/lib/systemd  # no systemd units shipped, ever
 }
