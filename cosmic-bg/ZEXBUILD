@@ -11,7 +11,8 @@ pkgrel=0
 # own aports/community APKBUILD for the same package (same epoch-1.5.0
 # tag, same pop-os source).
 source="https://github.com/pop-os/cosmic-bg/archive/refs/tags/epoch-1.6.0.tar.gz
-0001-overlayer-syshub-path.patch"
+0001-overlayer-syshub-path.patch
+0002-data-v1-all-syshub-path.patch"
 
 sha256sums=""  # TODO: re-pin for epoch-1.6.0 (was pinned for 1.5.0)
 
