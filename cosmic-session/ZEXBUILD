@@ -14,7 +14,8 @@ source="https://github.com/pop-os/cosmic-session/archive/refs/tags/epoch-1.6.0.t
 0001-no-systemd-default.patch
 0002-no-hard-systemd-dependency.patch
 0003-overlayer-syshub-path.patch
-0004-desktop-file-path.patch"
+0004-desktop-file-path.patch
+0005-start-cosmic-no-usr-path.patch"
 
 sha256sums=""  # TODO: re-pin for epoch-1.6.0 (was pinned for 1.5.0)
 
@@ -29,7 +30,14 @@ build() {
     # -- substrate's own packer blocks any /usr reference found in
     # shipped file content, this isn't optional cleanup.
     patch -p1 < ../0004-desktop-file-path.patch
-
+    # data/start-cosmic itself (the actual script cosmic.desktop's Exec=
+    # runs) still had /usr/bin/dbus-run-session and /usr/bin/cosmic-session
+    # hardcoded at the end -- 0004 only fixed the .desktop file's pointer
+    # TO this script, not the script's own content. Without this, session
+    # launch would hard-fail on Zainium (no /usr at all). dbus-run-session
+    # is dropped entirely -- the session bus is already up via
+    # oxibus-daemon/quantra-logind before this script ever runs.
+    patch -p1 < ../0005-start-cosmic-no-usr-path.patch
 
     cargo build --release --target x86_64-unknown-linux-musl
 }
