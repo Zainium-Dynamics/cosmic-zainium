@@ -18,7 +18,6 @@ source="https://github.com/pop-os/cosmic-greeter/archive/refs/tags/epoch-1.6.0.t
 0002-daemon-no-systemd-default.patch
 0003-overlayer-syshub-path.patch
 0004-elevate-pam-integration.patch
-0005-pin-libcosmic-rev.patch
 cosmic-greeter.elevate-pam.toml
 cosmic-greeter-daemon.quantra.toml
 cosmic-greeter.quantra.toml"
@@ -39,12 +38,6 @@ build() {
     patch -p1 < ../0002-daemon-no-systemd-default.patch
     patch -p1 < ../0003-overlayer-syshub-path.patch
     patch -p1 < ../0004-elevate-pam-integration.patch
-    # libcosmic is fetched unpinned (git, no rev) -- its current HEAD
-    # dropped Common::set_xkb_config (locker.rs:1080), which this
-    # tag's own source calls. Pinned to the commit the real Zainium
-    # reference build (ZAINIUM_DRIVE/cosmic) actually compiled
-    # successfully against with this exact locker.rs.
-    patch -p1 < ../0005-pin-libcosmic-rev.patch
 
     cargo build --release --target x86_64-unknown-linux-musl
 }

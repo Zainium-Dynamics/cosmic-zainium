@@ -249,26 +249,3 @@
      }
  }
  
-@@ -421,7 +447,7 @@
-                 for (i, layout) in self.common.active_layouts.iter().enumerate() {
-                     items.push(menu_checklist(
-                         &layout.description,
--                        i == self.common.current_keyboard_layout,
-+                        i == 0,
-                         Message::KeyboardLayout(i),
-                     ));
-                 }
-@@ -1044,10 +1070,10 @@
-                 }
-             },
-             Message::KeyboardLayout(layout_i) => {
--                if let Some(keyboard_layout) = &self.common.keyboard_layout {
--                    keyboard_layout.set_group(layout_i as u32);
-+                if layout_i < self.common.active_layouts.len() {
-+                    self.common.active_layouts.swap(0, layout_i);
-+                    self.common.set_xkb_config(&self.flags.user_data);
-                 }
--                self.common.current_keyboard_layout = layout_i;
-                 if self.dropdown_opt == Some(Dropdown::Keyboard) {
-                     self.dropdown_opt = None;
-                     return self.common.dropdown_blur_rects(false);
