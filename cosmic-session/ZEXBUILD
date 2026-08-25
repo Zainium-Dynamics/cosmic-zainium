@@ -1,7 +1,7 @@
 maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
 pkgname=cosmic-session
 pkgver=1.6.0
-pkgrel=0
+pkgrel=1
 # Commit archive at the exact pop-os/cosmic-session commit pinned by
 # ~/cosmic-epoch's epoch-1.5.0 submodule set. Patches: systemd removed
 # from default features (code changes too, where pristine code doesn't
