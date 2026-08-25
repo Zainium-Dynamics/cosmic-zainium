@@ -14,7 +14,7 @@ blake3           = ""
 ed25519_sig      = ""
 ed25519_pubkey   = ""
 
-depends          = ["cosmic-comp", "quantra-logind"]
+depends          = ["cosmic-comp", "quantra-logind", "quantra-ctl"]
 provides         = ["cosmic-session"]
 tags             = ["desktop", "cosmic"]
 
