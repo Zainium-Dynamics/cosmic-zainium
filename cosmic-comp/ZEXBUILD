@@ -1,7 +1,7 @@
 maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
 pkgname=cosmic-comp
 pkgver=1.6.0
-pkgrel=0
+pkgrel=1
 source="https://github.com/pop-os/cosmic-comp/archive/refs/tags/epoch-$pkgver.tar.gz
 0001-no-systemd-default.patch
 0002-bare-session-no-systemd.patch"
