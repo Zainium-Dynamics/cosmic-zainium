@@ -1,7 +1,7 @@
 maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
 pkgname=xdg-desktop-portal-cosmic
 pkgver=1.6.0
-pkgrel=0
+pkgrel=1
 # Commit archive at the exact pop-os/xdg-desktop-portal-cosmic commit pinned by
 # ~/cosmic-epoch's epoch-1.5.0 submodule set. Patches: systemd removed
 # from default features (code changes too, where pristine code doesn't
@@ -12,7 +12,8 @@ pkgrel=0
 # tag, same pop-os source).
 source="https://github.com/pop-os/xdg-desktop-portal-cosmic/archive/refs/tags/epoch-1.6.0.tar.gz
 0001-no-systemd-default.patch
-0002-overlayer-syshub-path.patch"
+0002-overlayer-syshub-path.patch
+0003-widget-screenshot-syshub-path.patch"
 
 sha256sums=""  # TODO: re-pin for epoch-1.6.0 (was pinned for 1.5.0)
 
@@ -31,6 +32,11 @@ build() {
 
     patch -p1 < ../0001-no-systemd-default.patch
     patch -p1 < ../0002-overlayer-syshub-path.patch
+    # 0002 only fixed src/screenshot.rs's two fallback paths -- the
+    # screenshot-picker widget (src/widget/screenshot.rs) has its own,
+    # separate hardcoded /usr/share/backgrounds/... literal used when no
+    # background is set for the selected output.
+    patch -p1 < ../0003-widget-screenshot-syshub-path.patch
 
     # bindgen's clang-sys dlopen's this by soname; point it at wherever
     # clang-libclang actually put it rather than trust auto-detection.
