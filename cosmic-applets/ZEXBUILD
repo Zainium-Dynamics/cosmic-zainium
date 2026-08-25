@@ -11,7 +11,8 @@ pkgrel=1
 # own aports/community APKBUILD for the same package (same epoch-1.5.0
 # tag, same pop-os source).
 source="https://github.com/pop-os/cosmic-applets/archive/refs/tags/epoch-1.6.0.tar.gz
-0001-no-desktop-systemd-scope.patch"
+0001-no-desktop-systemd-scope.patch
+0002-relative-applet-symlinks.patch"
 
 sha256sums=""
 
@@ -25,6 +26,11 @@ build() {
 }
 
 package() {
+    # applet symlinks were absolute, harmless once really installed but
+    # looks broken in any standalone extraction/chroot check -- relative
+    # is unambiguous everywhere.
+    patch -p1 < ../0002-relative-applet-symlinks.patch
+
     # This justfile's variable is `targetdir` (env('CARGO_TARGET_DIR',
     # 'target')), not `cargo-target-dir` like other components' -- every
     # justfile here names it differently, no universal CLI arg. The env
