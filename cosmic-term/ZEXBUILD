@@ -2,22 +2,10 @@ maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
 pkgname=cosmic-term
 pkgver=1.6.0
 pkgrel=0
-# Commit archive at the exact pop-os/cosmic-term commit pinned by
-# ~/cosmic-epoch's epoch-1.6.0 submodule set. Patch: adds a direct
-# oxidized-environment-core git dependency (same crate quantra-ctl links)
-# and a new src/env_resolver.rs module that resolves PATH/LD_LIBRARY_PATH/
-# XDG_DATA_DIRS/PKG_CONFIG_PATH from /overlayer/syshub/etc/oxienv.toml for
-# every new terminal tab -- config-gated (env_resolver_enabled, default
-# on), merges with the inherited environment rather than replacing it.
-# Verified against the real epoch-1.6.0 tarball: two hunks in the original
-# hand-provided patch (terminal_box.rs/terminal.rs clippy cleanups) were
-# already present upstream and dropped as redundant; Cargo.lock changes
-# also dropped -- cargo regenerates it from the new Cargo.toml dependency
-# on its own, no --locked/--frozen used here.
 source="https://github.com/pop-os/cosmic-term/archive/refs/tags/epoch-1.6.0.tar.gz
 0001-oxidized-env-resolver.patch"
 
-sha256sums=""  # TODO: pin once source URL is final
+sha256sums=""
 
 makedepends="cargo just libxkbcommon-dev wayland-dev"
 
