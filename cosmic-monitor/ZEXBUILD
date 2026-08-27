@@ -1,6 +1,6 @@
 maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
 pkgname=cosmic-monitor
-pkgver=1.6.0
+pkgver=1.7.0
 pkgrel=0
 # Commit archive at the exact pop-os/cosmic-monitor commit pinned by
 # ~/cosmic-epoch's epoch-1.5.0 submodule set. Patches: systemd removed
@@ -10,10 +10,10 @@ pkgrel=0
 # component's own Cargo.toml. Real tagged release + sha256sum, verified against Alpine's
 # own aports/community APKBUILD for the same package (same epoch-1.5.0
 # tag, same pop-os source).
-source="https://github.com/pop-os/cosmic-monitor/archive/refs/tags/epoch-1.6.0.tar.gz
+source="https://github.com/pop-os/cosmic-monitor/archive/refs/tags/epoch-1.7.0.tar.gz
 0001-overlayer-syshub-path.patch"
 
-sha256sums=""  # TODO: re-pin for epoch-1.6.0 (was pinned for 1.5.0)
+sha256sums=""
 
 build() {
     # GitHub tag-archive extracted-dir name is $pkgname-epoch-$pkgver, not $pkgname-$pkgver.
