@@ -2,7 +2,7 @@
 
 [package]
 name             = "cosmic-edit"
-version          = "1.5.0"
+version          = "1.7.0"
 description      = "Text editor for the COSMIC Desktop Environment"
 license          = "GPL-3.0-only"
 maintainer       = "Ali Zain <alizain@zainiumdynamics.tech>"
@@ -21,7 +21,7 @@ tags             = ["desktop", "cosmic", "app"]
 [install]
 bin     = "/overlayer/syshub/bin"
 share   = "/overlayer/syshub/share"
-_syshub = false
+_syshub = true
 
 [remove]
 files    = []
