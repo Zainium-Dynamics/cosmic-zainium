@@ -2,7 +2,7 @@
 
 [package]
 name             = "cosmic-settings-daemon"
-version          = "1.6.0"
+version          = "1.7.0"
 description      = "COSMIC settings daemon, systemd/dbus/flatpak free"
 license          = "GPL-3.0-only"
 maintainer       = "Ali Zain <alizain@zainiumdynamics.tech>"
