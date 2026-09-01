@@ -1,45 +1,25 @@
 maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
 pkgname=cosmic-comp
-pkgver=1.6.0
-pkgrel=1
+pkgver=1.7.0
+pkgrel=0
 source="https://github.com/pop-os/cosmic-comp/archive/refs/tags/epoch-$pkgver.tar.gz
-0001-no-systemd-default.patch
 0002-bare-session-no-systemd.patch"
 
 makedepends="cargo-auditable fontconfig-dev libdisplay-info-dev libinput-dev libseat-dev libxcb-dev libxkbcommon-dev mesa-dev pixman-dev wayland-dev"
 
 build() {
 	cd cosmic-comp-epoch-$pkgver
-
-	patch -p1 < ../0001-no-systemd-default.patch
-	# rewrites cosmic-service/cosmic.desktop, was 100% systemctl-dependent
 	patch -p1 < ../0002-bare-session-no-systemd.patch
-
-	# Zainium branding: our own cosmic-*.svg logos/splash art dropped
-	# into resources/ alongside the pristine pop-*.svg files (kept, not
-	# removed) -- same non-destructive pattern as cosmic-settings'/
-	# cosmic-screenshot's 9999-zainium-branding-logos.patch, just done
-	# as a direct copy since the assets are already staged as real
-	# files here, not a diff.
 	cp -a "$RECIPE_DIR"/resources/. resources/
 
-	# --frozen forbids ANY network access, including fetching git deps
-	# (smithay is pinned by git rev, not crates.io) -- there's no
-	# separate prepare()/fetch phase in this recipe format, so fetch
-	# explicitly first (network is available here), then the frozen
-	# build below finds everything already cached and stays reproducible.
 	cargo fetch --target x86_64-unknown-linux-musl
 	cargo auditable build --release --frozen --no-default-features --features logind
 }
 
 package() {
-	# Already inside cosmic-comp-epoch-$pkgver -- build() cd'd there and
-	# that cwd persists (same shell process, no subshell), cd-ing again
-	# here would look for a nested copy of the same dir name and fail.
+
 	make DESTDIR="$PAYLOAD_DIR" prefix=/overlayer/syshub install-bare-session
 	rm -rf "$PAYLOAD_DIR"/overlayer/syshub/lib/systemd  # no systemd units shipped, ever
-	# cosmic-session's own cosmic.desktop already owns this filename --
-	# rename ours so both packages can coexist as separate greetd choices
 	mv "$PAYLOAD_DIR"/overlayer/syshub/share/wayland-sessions/cosmic.desktop \
 		"$PAYLOAD_DIR"/overlayer/syshub/share/wayland-sessions/cosmic-bare.desktop
 }
