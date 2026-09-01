@@ -1,22 +1,19 @@
 maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
 pkgname=cosmic-applets
 pkgver=1.7.0
-pkgrel=1
-source="https://github.com/pop-os/cosmic-applets/archive/refs/tags/epoch-1.7.0.tar.gz
-0001-no-desktop-systemd-scope.patch"
+pkgrel=0
+source="https://github.com/pop-os/cosmic-applets/archive/refs/tags/epoch-1.7.0.tar.gz"
 
 sha256sums=""
 
 build() {
-    cd cosmic-applets-epoch-1.7.0
 
-    patch -p1 < ../0001-no-desktop-systemd-scope.patch
+    cd cosmic-applets-epoch-1.7.0
 
     cargo build --release --target x86_64-unknown-linux-musl
 }
 
 package() {
-    
     export CARGO_TARGET_DIR=target/x86_64-unknown-linux-musl
     just rootdir="$PAYLOAD_DIR" prefix=/overlayer/syshub install
 }
