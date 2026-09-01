@@ -3,7 +3,7 @@
 [package]
 name             = "cosmic-monitor"
 version          = "1.7.0"
-description      = "COSMIC system monitor, systemd/dbus/flatpak free"
+description      = "COSMIC system monitor"
 license          = "GPL-3.0-only"
 maintainer       = "Ali Zain <alizain@zainiumdynamics.tech>"
 homepage         = "https://github.com/pop-os/cosmic-monitor"

@@ -1,12 +1,12 @@
-# manifest.toml — cosmic-edit (userland tier)
+# manifest.toml — cosmic-term (userland tier)
 
 [package]
-name             = "cosmic-edit"
-version          = "1.7.0"
-description      = "Text editor for the COSMIC Desktop Environment"
+name             = "cosmic-term"
+version          = "1.6.0"
+description      = "Terminal emulator for the COSMIC Desktop Environment, with Zainium oxienv resolution"
 license          = "GPL-3.0-only"
 maintainer       = "Ali Zain <alizain@zainiumdynamics.tech>"
-homepage         = "https://github.com/pop-os/cosmic-edit"
+homepage         = "https://github.com/pop-os/cosmic-term"
 build_type       = "dynamic"
 libc_target      = "musl"
 
@@ -14,14 +14,14 @@ blake3           = ""
 ed25519_sig      = ""
 ed25519_pubkey   = ""
 
-depends          = ["cosmic-icons"]
-provides         = ["cosmic-edit"]
+depends          = []
+provides         = ["cosmic-term"]
 tags             = ["desktop", "cosmic", "app"]
 
 [install]
 bin     = "/overlayer/syshub/bin"
 share   = "/overlayer/syshub/share"
-_syshub = true
+_syshub = false
 
 [remove]
 files    = []

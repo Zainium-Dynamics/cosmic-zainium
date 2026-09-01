@@ -1,6 +1,6 @@
 maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
 pkgname=pop-launcher
-pkgver=1.6.0
+pkgver=1.7.0
 pkgrel=0
 # Commit archive at the exact pop-os/launcher commit pinned by
 # ~/cosmic-epoch's epoch-1.5.0 submodule set. Patches: systemd removed
@@ -9,7 +9,7 @@ pkgrel=0
 # /overlayer/syshub/... . No dbus/flatpak dependency exists in this
 # component's own Cargo.toml. No sha256sums yet (added once the source
 # URL is final).
-source="https://github.com/pop-os/launcher/archive/a332a3a73316a3595816dd02fe426a1d3543167a.tar.gz
+source="https://github.com/pop-os/launcher/archive/6390080a98a4a59b4e8196d28de97d3cb4d138ec.tar.gz
 0001-overlayer-syshub-paths.patch
 0002-terminal-plugin-syshub-fallback.patch"
 
@@ -26,7 +26,7 @@ makedepends="cargo just libevdev-dev"
 
 build() {
     # GitHub commit-archive extracted-dir name != $pkgname-$pkgver.
-    cd launcher-a332a3a73316a3595816dd02fe426a1d3543167a
+    cd launcher-6390080a98a4a59b4e8196d28de97d3cb4d138ec
 
     patch -p1 < ../0001-overlayer-syshub-paths.patch
     # terminal plugin's last-resort fallback still hardcoded /usr paths

@@ -1,0 +1,24 @@
+maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
+pkgname=cosmic-term
+pkgver=1.6.0
+pkgrel=0
+source="https://github.com/pop-os/cosmic-term/archive/refs/tags/epoch-1.6.0.tar.gz
+0001-oxidized-env-resolver.patch"
+
+sha256sums=""
+
+makedepends="cargo just libxkbcommon-dev wayland-dev"
+
+build() {
+    # GitHub tag-archive extracted-dir name is $pkgname-epoch-$pkgver, not $pkgname-$pkgver.
+    cd cosmic-term-epoch-1.6.0
+
+    patch -p1 < ../0001-oxidized-env-resolver.patch
+
+    cargo build --release --target x86_64-unknown-linux-musl
+}
+
+package() {
+    just rootdir="$PAYLOAD_DIR" prefix=/overlayer/syshub \
+        cargo-target-dir=target/x86_64-unknown-linux-musl install
+}
