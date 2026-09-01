@@ -1,6 +1,6 @@
 maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
 pkgname=cosmic-greeter
-pkgver=1.6.0
+pkgver=1.7.0
 pkgrel=0
 # Commit archive at the exact pop-os/cosmic-greeter commit pinned by
 # ~/cosmic-epoch's epoch-1.5.0 submodule set. Patches 0001/0004: real,
@@ -13,7 +13,7 @@ pkgrel=0
 # elevate-pam does password auth only -- session open/close is quantra-
 # logind's job (JSON control socket + login1 D-Bus), no PAM session
 # module involved, pam.d and pam_quantra.so are fully removed.
-source="https://github.com/pop-os/cosmic-greeter/archive/refs/tags/epoch-1.6.0.tar.gz
+source="https://github.com/pop-os/cosmic-greeter/archive/refs/tags/epoch-1.7.0.tar.gz
 0001-main-no-systemd-default-and-elevate-pam.patch
 0002-daemon-no-systemd-default.patch
 0003-overlayer-syshub-path.patch
@@ -23,7 +23,7 @@ cosmic-greeter.elevate-pam.toml
 cosmic-greeter-daemon.quantra.toml
 cosmic-greeter.quantra.toml"
 
-sha256sums=""  # TODO: re-pin for epoch-1.6.0 (was pinned for 1.5.0)
+sha256sums=""  # TODO: re-pin for epoch-1.7.0 (was pinned for 1.5.0)
 
 # Build-time: cargo fetches the elevate-pam crate straight from its
 # GitLab git remote (network access, same as any other cargo git dep --
@@ -33,7 +33,7 @@ makedepends="cargo just eudev-dev libinput-dev libseat-dev libxkbcommon-dev wayl
 
 build() {
     # GitHub tag-archive extracted-dir name is $pkgname-epoch-$pkgver, not $pkgname-$pkgver.
-    cd cosmic-greeter-epoch-1.6.0
+    cd cosmic-greeter-epoch-1.7.0
 
     patch -p1 < ../0001-main-no-systemd-default-and-elevate-pam.patch
     patch -p1 < ../0002-daemon-no-systemd-default.patch
