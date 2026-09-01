@@ -1,6 +1,6 @@
 maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
 pkgname=cosmic-applibrary
-pkgver=1.6.0
+pkgver=1.7.0
 pkgrel=0
 # Commit archive at the exact pop-os/cosmic-applibrary commit pinned by
 # ~/cosmic-epoch's epoch-1.5.0 submodule set. Patches: systemd removed
@@ -12,14 +12,14 @@ pkgrel=0
 # tag, same pop-os source).
 # pop-os/cosmic-applibrary was renamed to pop-os/cosmic-app-library on
 # GitHub (old URL 301-redirects) — using the canonical name directly.
-source="https://github.com/pop-os/cosmic-app-library/archive/refs/tags/epoch-1.6.0.tar.gz
+source="https://github.com/pop-os/cosmic-app-library/archive/refs/tags/epoch-1.7.0.tar.gz
 0001-no-desktop-systemd-scope.patch"
 
-sha256sums=""  # TODO: re-pin for epoch-1.6.0 (was pinned for 1.5.0)
+sha256sums=""  # TODO: re-pin for epoch-1.7.0 (was pinned for 1.5.0)
 
 build() {
     # GitHub tag-archive extracted-dir name is $pkgname-epoch-$pkgver, not $pkgname-$pkgver.
-    cd cosmic-app-library-epoch-1.6.0
+    cd cosmic-app-library-epoch-1.7.0
 
     patch -p1 < ../0001-no-desktop-systemd-scope.patch
 
