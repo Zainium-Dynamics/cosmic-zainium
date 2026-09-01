@@ -2,7 +2,7 @@
 
 [package]
 name             = "cosmic-randr"
-version          = "1.5.0"
+version          = "1.7.0"
 description      = "Display configuration library for the COSMIC Desktop Environment"
 license          = "MPL-2.0"
 maintainer       = "Ali Zain <alizain@zainiumdynamics.tech>"
