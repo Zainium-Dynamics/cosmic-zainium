@@ -5,6 +5,6 @@
      "tokio",
      "single-instance",
 +    "desktop",
+     "desktop-systemd-scope",
      "xdg-portal",
  ] }
- tracing = "0.1"

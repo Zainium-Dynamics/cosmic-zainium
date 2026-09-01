@@ -2,7 +2,7 @@
 
 [package]
 name             = "cosmic-launcher"
-version          = "1.6.0"
+version          = "1.7.0"
 description      = "COSMIC application launcher, systemd/dbus/flatpak free"
 license          = "GPL-3.0-only"
 maintainer       = "Ali Zain <alizain@zainiumdynamics.tech>"
