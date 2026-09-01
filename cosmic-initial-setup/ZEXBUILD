@@ -1,6 +1,6 @@
 maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
 pkgname=cosmic-initial-setup
-pkgver=1.6.0
+pkgver=1.7.0
 pkgrel=0
 # Commit archive at the exact pop-os/cosmic-initial-setup commit pinned by
 # ~/cosmic-epoch's epoch-1.5.0 submodule set (verified: git clone --branch
@@ -12,14 +12,14 @@ pkgrel=0
 # component's own Cargo.toml. Real tagged release, matching Alpine's own
 # aports/community APKBUILD for the same package (same epoch-1.5.0 tag,
 # same pop-os source).
-source="https://github.com/pop-os/cosmic-initial-setup/archive/refs/tags/epoch-1.6.0.tar.gz
+source="https://github.com/pop-os/cosmic-initial-setup/archive/refs/tags/epoch-1.7.0.tar.gz
 0001-overlayer-syshub-paths.patch"
 
-sha256sums=""  # TODO: re-pin for epoch-1.6.0 (was pinned for 1.5.0)
+sha256sums=""  # TODO: re-pin for epoch-1.7.0 (was pinned for 1.5.0)
 
 build() {
     # GitHub tag-archive extracted-dir name is $pkgname-epoch-$pkgver, not $pkgname-$pkgver.
-    cd cosmic-initial-setup-epoch-1.6.0
+    cd cosmic-initial-setup-epoch-1.7.0
 
     patch -p1 < ../0001-overlayer-syshub-paths.patch
 
