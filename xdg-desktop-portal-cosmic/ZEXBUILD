@@ -1,68 +1,28 @@
 maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
 pkgname=xdg-desktop-portal-cosmic
-pkgver=1.6.0
-pkgrel=1
-# Commit archive at the exact pop-os/xdg-desktop-portal-cosmic commit pinned by
-# ~/cosmic-epoch's epoch-1.5.0 submodule set. Patches: systemd removed
-# from default features (code changes too, where pristine code doesn't
-# compile with systemd off) + any /usr/... path fixed to
-# /overlayer/syshub/... . No dbus/flatpak dependency exists in this
-# component's own Cargo.toml. Real tagged release + sha256sum, verified against Alpine's
-# own aports/community APKBUILD for the same package (same epoch-1.5.0
-# tag, same pop-os source).
-source="https://github.com/pop-os/xdg-desktop-portal-cosmic/archive/refs/tags/epoch-1.6.0.tar.gz
-0001-no-systemd-default.patch
+pkgver=1.7.0
+pkgrel=0
+source="https://github.com/pop-os/xdg-desktop-portal-cosmic/archive/refs/tags/epoch-1.7.0.tar.gz
 0002-overlayer-syshub-path.patch
 0003-widget-screenshot-syshub-path.patch"
 
-sha256sums=""  # TODO: re-pin for epoch-1.6.0 (was pinned for 1.5.0)
-
-# makedepends was missing entirely -- glib-sys needs glib-2.0 via
-# pkg-config, plus the rest of the portal's real build-time C deps
-# (screencast/screenshot via pipewire, session bus via dbus).
-# clang-libclang: libspa-sys (pipewire-rs) uses bindgen, which dlopen's
-# libclang.so at runtime -- Alpine's llvm/clang packages only ship the
-# fully-versioned libclang.so.N.N.N by default, clang-libclang is the
-# one that actually provides the loadable libclang.so.
+sha256sums=""  
 makedepends="cargo just glib-dev wayland-dev libxkbcommon-dev dbus-dev pipewire-dev mesa-dev clang-libclang"
 
 build() {
-    # GitHub tag-archive extracted-dir name is $pkgname-epoch-$pkgver, not $pkgname-$pkgver.
-    cd xdg-desktop-portal-cosmic-epoch-1.6.0
+    cd xdg-desktop-portal-cosmic-epoch-1.7.0
 
-    patch -p1 < ../0001-no-systemd-default.patch
     patch -p1 < ../0002-overlayer-syshub-path.patch
-    # 0002 only fixed src/screenshot.rs's two fallback paths -- the
-    # screenshot-picker widget (src/widget/screenshot.rs) has its own,
-    # separate hardcoded /usr/share/backgrounds/... literal used when no
-    # background is set for the selected output.
     patch -p1 < ../0003-widget-screenshot-syshub-path.patch
 
-    # bindgen's clang-sys dlopen's this by soname; point it at wherever
-    # clang-libclang actually put it rather than trust auto-detection.
     export LIBCLANG_PATH="$(dirname "$(find /usr/lib -name 'libclang.so*' | head -1)")"
-
-    # Build-script/proc-macro binaries (host artifacts) inherit musl's
-    # bare default of crt-static (fully static) unless told otherwise,
-    # and a static binary can't dlopen anything -- bindgen/clang-sys
-    # hits this as "Dynamic loading not supported" even with
-    # LIBCLANG_PATH set correctly. Cargo's [host] config table is the
-    # correct, scoped way to fix only host-artifact flags -- unlike a
-    # bare RUSTFLAGS env var, it does NOT also override
-    # CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_RUSTFLAGS for this
-    # package's own --target output (that broke musl-loader linking
-    # for every package the one time this was tried as a global
-    # RUSTFLAGS export in ci/build.sh instead -- see that file's own
-    # comment on why it's not there anymore).
     mkdir -p .cargo
     cat > .cargo/config.toml <<-'EOF'
 	[host]
 	rustflags = ["-C", "target-feature=-crt-static"]
 	EOF
 
-    # [host] is still an unstable cargo table -- silently does nothing
-    # without these two -Z flags, even on a nightly toolchain. That's
-    # why the config.toml above alone didn't help the first time.
+  
     cargo build -Z host-config -Z target-applies-to-host \
         --release --target x86_64-unknown-linux-musl
 }
@@ -70,5 +30,5 @@ build() {
 package() {
     just rootdir="$PAYLOAD_DIR" prefix=/overlayer/syshub \
         cargo-target-dir=target/x86_64-unknown-linux-musl install
-    rm -rf "$PAYLOAD_DIR"/overlayer/syshub/lib/systemd  # no systemd units shipped, ever
+
 }
