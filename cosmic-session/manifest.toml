@@ -2,7 +2,7 @@
 
 [package]
 name             = "cosmic-session"
-version          = "1.5.0"
+version          = "1.7.0"
 description      = "COSMIC session launcher, systemd/dbus/flatpak free (login1 via quantra-logind + oxibus)"
 license          = "GPL-3.0-or-later"
 maintainer       = "Ali Zain <alizain@zainiumdynamics.tech>"
