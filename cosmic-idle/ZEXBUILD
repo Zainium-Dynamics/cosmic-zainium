@@ -1,9 +1,9 @@
 maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
 pkgname=cosmic-idle
-pkgver=1.6.0
+pkgver=1.7.0
 pkgrel=0
 # No systemd/logind Cargo feature. TODO: sha256sums.
-# Note: pinned to epoch-1.6.0, not epoch-1.5.0 like every other
+# Note: pinned to epoch-1.7.0, not epoch-1.5.0 like every other
 # component here -- pop-os/cosmic-idle's tag list moved ahead on its
 # own (confirmed on github.com/pop-os/cosmic-idle/releases). Also fixed
 # the source= line itself: ci/build.sh's fetch loop only recognizes a
