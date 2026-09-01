@@ -1,9 +1,0 @@
---- a/daemon/Cargo.toml
-+++ b/daemon/Cargo.toml
-@@ -30,5 +30,5 @@
- xdg = "3.0"
- 
- [features]
--default = ["systemd"]
-+default = []
- systemd = ["tracing-journald"]

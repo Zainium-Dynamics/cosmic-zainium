@@ -1,9 +1,0 @@
-# quantra service unit -- installed to
-# /overlayer/syshub/etc/quantra-system/services/cosmic-greeter-daemon.toml
-# (quantra::config::Config::services_dir default). Schema:
-# quantra-system/quantra/src/services/types.rs::Service (deny_unknown_fields).
-name = "cosmic-greeter-daemon"
-description = "COSMIC Greeter D-Bus session helper"
-command = "/overlayer/syshub/bin/cosmic-greeter-daemon"
-restart = "always"
-dependencies = ["quantra-logind", "oxibus-daemon"]
