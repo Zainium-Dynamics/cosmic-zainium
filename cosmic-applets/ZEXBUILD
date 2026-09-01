@@ -1,7 +1,7 @@
 maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
 pkgname=cosmic-applets
-pkgver=1.6.0
-pkgrel=1
+pkgver=1.7.0
+pkgrel=0
 # Commit archive at the exact pop-os/cosmic-applets commit pinned by
 # ~/cosmic-epoch's epoch-1.5.0 submodule set. Patches: systemd removed
 # from default features (code changes too, where pristine code doesn't
@@ -10,14 +10,14 @@ pkgrel=1
 # component's own Cargo.toml. Real tagged release + sha256sum, verified against Alpine's
 # own aports/community APKBUILD for the same package (same epoch-1.5.0
 # tag, same pop-os source).
-source="https://github.com/pop-os/cosmic-applets/archive/refs/tags/epoch-1.6.0.tar.gz
+source="https://github.com/pop-os/cosmic-applets/archive/refs/tags/epoch-1.7.0.tar.gz
 0001-no-desktop-systemd-scope.patch"
 
 sha256sums=""
 
 build() {
     # GitHub tag-archive extracted-dir name is $pkgname-epoch-$pkgver, not $pkgname-$pkgver.
-    cd cosmic-applets-epoch-1.6.0
+    cd cosmic-applets-epoch-1.7.0
 
     patch -p1 < ../0001-no-desktop-systemd-scope.patch
 
