@@ -1,0 +1,32 @@
+maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
+pkgname=cosmic-store
+pkgver=1.2.0
+pkgrel=0
+# Zainium's own maintained fork (github.com/Zainium-Dynamics/cosmic-store),
+# not a patch-on-pop-os-tarball package like the rest of this repo -- it's
+# a real fork with its own commit history, based on pop-os cosmic-store
+# epoch-1.7.0 (verified: src/*.rs outside backend/ diffs cleanly against
+# the real epoch-1.7.0 tarball, Cargo.toml's own pre-edit version field
+# was "1.7.0"). src/backend/ is fully replaced with an Alpine/Void musl
+# package engine (alpine_musl.rs, elfpatch.rs, extract.rs, install_root.rs,
+# pcpatch.rs, receipt.rs, relink.rs, shebangpatch.rs, void_musl.rs) --
+# no Flatpak/PackageKit/rpm-ostree, packages install into zexlib. Future
+# re-syncs to a newer pop-os epoch happen as a merge inside that repo,
+# not as hand-rolled patches here.
+source="https://github.com/Zainium-Dynamics/cosmic-store/archive/4c796ec50f03f34cefca612e00551b706e8f197c.tar.gz"
+
+sha256sums=""
+
+makedepends="cargo just wayland-dev libxkbcommon-dev"
+
+build() {
+    # GitHub commit-archive extracted-dir name is $pkgname-<full-sha>.
+    cd cosmic-store-4c796ec50f03f34cefca612e00551b706e8f197c
+
+    cargo build --release --target x86_64-unknown-linux-musl
+}
+
+package() {
+    just rootdir="$PAYLOAD_DIR" prefix=/overlayer/syshub \
+        cargo-target-dir=target/x86_64-unknown-linux-musl install
+}
