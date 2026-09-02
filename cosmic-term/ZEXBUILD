@@ -1,8 +1,8 @@
 maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
 pkgname=cosmic-term
-pkgver=1.6.0
+pkgver=1.7.0
 pkgrel=0
-source="https://github.com/pop-os/cosmic-term/archive/refs/tags/epoch-1.6.0.tar.gz
+source="https://github.com/pop-os/cosmic-term/archive/refs/tags/epoch-1.7.0.tar.gz
 0001-oxidized-env-resolver.patch"
 
 sha256sums=""
@@ -11,7 +11,7 @@ makedepends="cargo just libxkbcommon-dev wayland-dev"
 
 build() {
     # GitHub tag-archive extracted-dir name is $pkgname-epoch-$pkgver, not $pkgname-$pkgver.
-    cd cosmic-term-epoch-1.6.0
+    cd cosmic-term-epoch-1.7.0
 
     patch -p1 < ../0001-oxidized-env-resolver.patch
 
