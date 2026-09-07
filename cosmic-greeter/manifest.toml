@@ -14,13 +14,14 @@ blake3           = ""
 ed25519_sig      = ""
 ed25519_pubkey   = ""
 
-depends          = ["cosmic-comp", "quantra-logind", "elevate-pam", "greetd"]
+depends          = ["cosmic-comp", "logind", "elevate-pam", "greetd"]
 provides         = ["cosmic-greeter"]
 tags             = ["desktop", "cosmic"]
 
 [install]
 bin     = "/overlayer/syshub/bin"
 etc     = "/overlayer/syshub/etc"
+share   = "/overlayer/syshub/share"
 _syshub = true
 
 [remove]
