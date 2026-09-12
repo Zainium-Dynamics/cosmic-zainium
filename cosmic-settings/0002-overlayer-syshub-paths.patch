@@ -1,3 +1,9 @@
+--- a/cosmic-settings/src/pages/system/info.rs
++++ b/cosmic-settings/src/pages/system/info.rs
+@@ -256,2 +256,2 @@ fn operating_system() -> String {
+-    let content = read_to_string("/etc/os-release").unwrap_or_default();
++    let content = read_to_string("/overlayer/syshub/etc/os-release").unwrap_or_default();
+
 --- a/cosmic-settings/src/pages/desktop/appearance/icon_themes.rs
 +++ b/cosmic-settings/src/pages/desktop/appearance/icon_themes.rs
 @@ -142,7 +142,7 @@
@@ -5,7 +11,7 @@
          .as_deref()
          // Default from the XDG Base Directory Specification
 -        .or(Some("/usr/local/share/:/usr/share/"))
-+        .or(Some("/overlayer/syshub/local/share/:/overlayer/syshub/share/"))
++        .or(Some("/overlayer/syshub/share/"))
          .into_iter()
          .flat_map(|arg| std::env::split_paths(arg).map(|dir| dir.join("icons")));
  
@@ -27,7 +33,7 @@
  use zbus_polkit::policykit1::CheckAuthorizationFlags;
  
 -const DEFAULT_ICON_FILE: &str = "/usr/share/pixmaps/faces/pop-robot.png";
-+const DEFAULT_ICON_FILE: &str = "/overlayer/syshub/share/pixmaps/faces/pop-robot.png";
++const DEFAULT_ICON_FILE: &str = "/overlayer/syshub/share/pixmaps/faces/cute-panda.png";
  const USERS_ADMIN_POLKIT_POLICY_ID: &str = "com.system76.CosmicSettings.Users.Admin";
  
  // AccountsService has a hard limit of 1MB for icon files
