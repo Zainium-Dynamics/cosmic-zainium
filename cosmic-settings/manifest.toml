@@ -2,7 +2,7 @@
 
 [package]
 name             = "cosmic-settings"
-version          = "1.7.0"
+version          = "1.8.0"
 description      = "COSMIC settings app, systemd/dbus/flatpak free"
 license          = "GPL-3.0-only"
 maintainer       = "Ali Zain <alizain@zainiumdynamics.tech>"
@@ -14,12 +14,12 @@ blake3           = ""
 ed25519_sig      = ""
 ed25519_pubkey   = ""
 
-depends          = ["quantra"]
 provides         = ["cosmic-settings"]
 tags             = ["desktop", "cosmic"]
 
 [install]
 bin     = "/overlayer/syshub/bin"
+share   ="/overlayer/syshub/share"
 _syshub = true
 
 [remove]
