@@ -8,7 +8,7 @@ source="https://github.com/pop-os/cosmic-settings-daemon/archive/refs/tags/epoch
 makedepends="cargo clang-libclang libinput-dev libxkbcommon-dev openssl-dev pipewire-dev pulseaudio-dev"
 
 build() {
-    cd cosmic-settings-daemon-epoch-1.7.0
+    cd cosmic-settings-daemon-epoch-1.8.0
 
     patch -p1 < ../0001-overlayer-syshub-paths.patch
 
