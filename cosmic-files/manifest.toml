@@ -2,10 +2,10 @@
 
 [package]
 name             = "cosmic-files"
-version          = "1.7.0"
+version          = "1.8.0"
 description      = "File browser for the COSMIC Desktop Environment"
 license          = "GPL-3.0-only"
-maintainer       = "Ali Zain <alizain@zainiumdynamics.tech>"
+maintainer       = "Zainium <alizain@zainiumdynamics.tech>"
 homepage         = "https://github.com/pop-os/cosmic-files"
 build_type       = "dynamic"
 libc_target      = "musl"
@@ -21,7 +21,7 @@ tags             = ["desktop", "cosmic", "app"]
 [install]
 bin     = "/overlayer/syshub/bin"
 share   = "/overlayer/syshub/share"
-_syshub = false
+_syshub = true 
 
 [remove]
 files    = []
