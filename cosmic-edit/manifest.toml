@@ -1,4 +1,4 @@
-# manifest.toml — cosmic-edit [package]
+[package]
 name             = "cosmic-edit"
 version          = "1.8.0"
 description      = "Text editor for the COSMIC Desktop Environment"
