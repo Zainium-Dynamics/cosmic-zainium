@@ -1,9 +1,7 @@
 maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
 pkgname=cosmic-files
-pkgver=1.7.0
+pkgver=1.8.0
 pkgrel=0
-# No systemd/logind Cargo feature -- file manager, no session/bus
-# integration of its own. TODO: sha256sums.
 source="https://github.com/pop-os/cosmic-files/archive/refs/tags/epoch-$pkgver.tar.gz"
 
 makedepends="cargo clang-libclang glib-dev just libxkbcommon-dev wayland-dev"
