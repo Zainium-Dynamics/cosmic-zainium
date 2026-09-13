@@ -1,11 +1,9 @@
-# manifest.toml — cosmic-edit (userland tier)
-
-[package]
+# manifest.toml — cosmic-edit [package]
 name             = "cosmic-edit"
-version          = "1.7.0"
+version          = "1.8.0"
 description      = "Text editor for the COSMIC Desktop Environment"
 license          = "GPL-3.0-only"
-maintainer       = "Ali Zain <alizain@zainiumdynamics.tech>"
+maintainer       = "Zainium <alizain@zainiumdynamics.tech>"
 homepage         = "https://github.com/pop-os/cosmic-edit"
 build_type       = "dynamic"
 libc_target      = "musl"
