@@ -1,8 +1,8 @@
 maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
 pkgname=xdg-desktop-portal-cosmic
-pkgver=1.7.0
+pkgver=1.8.0
 pkgrel=0
-source="https://github.com/pop-os/xdg-desktop-portal-cosmic/archive/refs/tags/epoch-1.7.0.tar.gz
+source="https://github.com/pop-os/xdg-desktop-portal-cosmic/archive/refs/tags/epoch-1.8.0.tar.gz
 0002-overlayer-syshub-path.patch
 0003-widget-screenshot-syshub-path.patch"
 
@@ -10,7 +10,7 @@ sha256sums=""
 makedepends="cargo just glib-dev wayland-dev libxkbcommon-dev dbus-dev pipewire-dev mesa-dev clang-libclang"
 
 build() {
-    cd xdg-desktop-portal-cosmic-epoch-1.7.0
+    cd xdg-desktop-portal-cosmic-epoch-1.8.0
 
     patch -p1 < ../0002-overlayer-syshub-path.patch
     patch -p1 < ../0003-widget-screenshot-syshub-path.patch
