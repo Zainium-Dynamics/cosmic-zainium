@@ -1,6 +1,6 @@
 maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
 pkgname=cosmic-workspaces-epoch
-pkgver=1.7.0
+pkgver=1.8.0
 pkgrel=0
 # Renamed from the old Alpine APKBUILD's pkgname=cosmic-workspaces to
 # match the actual upstream repo name (pop-os/cosmic-workspaces-epoch)
@@ -8,12 +8,17 @@ pkgrel=0
 # working around that mismatch; with pkgname matching upstream, the
 # plain "$pkgname-epoch-$pkgver" tag-archive dir name convention just
 # works. No systemd/logind Cargo feature. TODO: sha256sums.
-source="https://github.com/pop-os/cosmic-workspaces-epoch/archive/refs/tags/epoch-$pkgver.tar.gz"
+source="https://github.com/pop-os/cosmic-workspaces-epoch/archive/refs/tags/epoch-$pkgver.tar.gz
+0001-shell-spawn-syshub-path.patch"
 
 makedepends="cargo eudev-dev desktop-file-utils libinput-dev libxkbcommon-dev mesa-dev wayland-dev wayland-protocols"
 
 build() {
 	cd cosmic-workspaces-epoch-epoch-$pkgver
+	# System-action keybinds (open launcher/app-library) were spawned via
+	# a hardcoded /bin/sh -- doesn't exist on Zainium, only
+	# /overlayer/syshub/bin/sh does.
+	patch -p1 < ../0001-shell-spawn-syshub-path.patch
 	# No explicit --target here: the Makefile's own `install` target
 	# hardcodes target/release/$(BINARY) (no cross-target awareness),
 	# and Alpine's host toolchain already IS x86_64-unknown-linux-musl,
