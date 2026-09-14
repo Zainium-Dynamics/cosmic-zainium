@@ -20,7 +20,7 @@
 -# /etc/profile contains a lot of important environment variables
 -source /etc/profile
 -
-+#!/bin/sh
++#!/overlayer/syshub/bin/sh
  export XDG_CURRENT_DESKTOP=cosmic
 -
 -# save environment variables that will be added to systemd
