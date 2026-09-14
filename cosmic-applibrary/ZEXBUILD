@@ -9,7 +9,6 @@ build() {
 
     cd cosmic-app-library-epoch-1.8.0
 
-    just xdgen
     cargo build --release --target x86_64-unknown-linux-musl
 }
 
