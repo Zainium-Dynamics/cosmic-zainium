@@ -19,6 +19,9 @@ build() {
     patch -p1 < ../0001-main-no-systemd-default-and-elevate-pam.patch
     patch -p1 < ../0003-overlayer-syshub-path.patch
     patch -p1 < ../0004-elevate-pam-integration.patch
+    # also relocates the script's own shebang: /bin/sh isn't a real path on
+    # Zainium, only /overlayer/syshub/bin/sh is -- this script is exec'd
+    # directly, so a dangling shebang would fail the greeter outright.
     patch -p1 < ../0006-start-script-syshub-path.patch
     # daemon/src/lib.rs read /etc/login.defs for UID_MIN/UID_MAX (falls back
     # to 1000/65000 if missing) -- on Zainium that file, if shipped at all,
