@@ -3,14 +3,19 @@ pkgname=cosmic-comp
 pkgver=1.8.0
 pkgrel=0
 source="https://github.com/pop-os/cosmic-comp/archive/refs/tags/epoch-$pkgver.tar.gz
-0002-bare-session-no-systemd.patch
+0002-bare-session.patch
 0003-shell-spawn-syshub-path.patch"
 
 makedepends="cargo-auditable fontconfig-dev libdisplay-info-dev libinput-dev libseat-dev libxcb-dev libxkbcommon-dev mesa-dev pixman-dev wayland-dev"
 
 build() {
 	cd cosmic-comp-epoch-$pkgver
-	patch -p1 < ../0002-bare-session-no-systemd.patch
+	# Bare-session's cosmic-service now goes through quantra-ctl's
+	# /overlayer/syshub/bin/systemctl shim instead of stripping systemd
+	# calls outright -- same shim cosmic-session and pop-launcher already
+	# depend on. Unit files stay shipped (no rm -rf lib/systemd below):
+	# the shim reads them to know what "start cosmic-comp.service" means.
+	patch -p1 < ../0002-bare-session.patch
 	# actions.rs spawned keybind commands via a hardcoded /bin/sh -- doesn't
 	# exist on Zainium, only /overlayer/syshub/bin/sh does. Every custom
 	# keybind command (Super+Enter terminal, etc.) would fail to launch.
@@ -18,13 +23,12 @@ build() {
 	cp -a "$RECIPE_DIR"/resources/. resources/
 
 	cargo fetch --target x86_64-unknown-linux-musl
-	cargo auditable build --release --frozen --no-default-features --features logind
+	cargo build --release --target x86_64-unknown-linux-musl
 }
 
 package() {
 
 	make DESTDIR="$PAYLOAD_DIR" prefix=/overlayer/syshub install-bare-session
-	rm -rf "$PAYLOAD_DIR"/overlayer/syshub/lib/systemd  # no systemd units shipped, ever
 	mv "$PAYLOAD_DIR"/overlayer/syshub/share/wayland-sessions/cosmic.desktop \
 		"$PAYLOAD_DIR"/overlayer/syshub/share/wayland-sessions/cosmic-bare.desktop
 }
