@@ -1,22 +1,37 @@
 maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
 pkgname=cosmic-session
-pkgver=1.7.0
+pkgver=1.8.0
 pkgrel=0
-source="https://github.com/pop-os/cosmic-session/archive/refs/tags/epoch-1.7.0.tar.gz
+source="https://github.com/pop-os/cosmic-session/archive/refs/tags/epoch-1.8.0.tar.gz
 0003-overlayer-syshub-path.patch
 0004-desktop-file-path.patch
 0005-start-cosmic-no-usr-path.patch
-0006-qt-plugin-path-syshub.patch"
+0006-qt-plugin-path-syshub.patch
+0007-etc-xdg-autostart-syshub-path.patch
+0008-start-cosmic-shebang-syshub-path.patch"
 
 sha256sums=""
 
 build() {
-    cd cosmic-session-epoch-1.7.0
+    cd cosmic-session-epoch-1.8.0
 
     patch -p1 < ../0003-overlayer-syshub-path.patch
     patch -p1 < ../0004-desktop-file-path.patch
     patch -p1 < ../0005-start-cosmic-no-usr-path.patch
     patch -p1 < ../0006-qt-plugin-path-syshub.patch
+    # src/main.rs's autostart dir scan falls back to a hardcoded /etc/xdg/
+    # when $XDG_CONFIG_DIRS isn't set. Currently dead code (this recipe
+    # doesn't build with --features autostart, so the block isn't even
+    # compiled in) -- fixed anyway so the path is correct the day that
+    # feature gets turned on, instead of shipping another silent /etc
+    # leftover to rediscover later.
+    patch -p1 < ../0007-etc-xdg-autostart-syshub-path.patch
+    # data/start-cosmic's own shebang was still #!/bin/sh -- 0005/0006 only
+    # fixed paths *inside* the script, not the interpreter line greetd's
+    # exec relies on to find it. /bin/sh doesn't exist on Zainium, only
+    # /overlayer/syshub/bin/sh does, so this was a launch-time failure
+    # waiting to happen.
+    patch -p1 < ../0008-start-cosmic-shebang-syshub-path.patch
 
     cargo build --release --target x86_64-unknown-linux-musl
 }
