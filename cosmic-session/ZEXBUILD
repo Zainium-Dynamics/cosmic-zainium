@@ -7,7 +7,8 @@ source="https://github.com/pop-os/cosmic-session/archive/refs/tags/epoch-1.8.0.t
 0004-desktop-file-path.patch
 0005-start-cosmic-no-usr-path.patch
 0006-qt-plugin-path-syshub.patch
-0007-etc-xdg-autostart-syshub-path.patch"
+0007-etc-xdg-autostart-syshub-path.patch
+0008-start-cosmic-shebang-syshub-path.patch"
 
 sha256sums=""
 
@@ -25,6 +26,12 @@ build() {
     # feature gets turned on, instead of shipping another silent /etc
     # leftover to rediscover later.
     patch -p1 < ../0007-etc-xdg-autostart-syshub-path.patch
+    # data/start-cosmic's own shebang was still #!/bin/sh -- 0005/0006 only
+    # fixed paths *inside* the script, not the interpreter line greetd's
+    # exec relies on to find it. /bin/sh doesn't exist on Zainium, only
+    # /overlayer/syshub/bin/sh does, so this was a launch-time failure
+    # waiting to happen.
+    patch -p1 < ../0008-start-cosmic-shebang-syshub-path.patch
 
     cargo build --release --target x86_64-unknown-linux-musl
 }
