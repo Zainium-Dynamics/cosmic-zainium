@@ -1,13 +1,13 @@
 maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
 pkgname=cosmic-notifications
-pkgver=1.7.0
+pkgver=1.8.0
 pkgrel=0
-source="https://github.com/pop-os/cosmic-notifications/archive/refs/tags/epoch-1.7.0.tar.gz"
+source="https://github.com/pop-os/cosmic-notifications/archive/refs/tags/epoch-1.8.0.tar.gz"
 
 sha256sums=""
 
 build() {
-    cd cosmic-notifications-epoch-1.7.0
+    cd cosmic-notifications-epoch-1.8.0
 
     cargo build --release --target x86_64-unknown-linux-musl
 }
