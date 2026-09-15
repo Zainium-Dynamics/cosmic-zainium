@@ -60,6 +60,43 @@ src = src.replace(
 )
 open("src/main.c", "w").write(src)
 PYEOF
+	# rpmatch() is a glibc extension, musl doesn't have it -- shim it
+	python3 - <<'PYEOF2'
+src = open("src/libply/ply-command-parser.c").read()
+anchor = (
+    "static bool\n"
+    "argument_is_option (const char *argument)\n"
+    "{\n"
+    "        return argument[0] == '-' && argument[1] == '-';\n"
+    "}\n"
+    "\n"
+    "static bool\n"
+    "ply_command_option_read_arguments (ply_command_option_t *option,"
+)
+shim = (
+    "static bool\n"
+    "argument_is_option (const char *argument)\n"
+    "{\n"
+    "        return argument[0] == '-' && argument[1] == '-';\n"
+    "}\n"
+    "\n"
+    "static int\n"
+    "rpmatch (const char *response)\n"
+    "{\n"
+    "        if (response[0] == 'y' || response[0] == 'Y' || strcmp (response, \"1\") == 0)\n"
+    "                return 1;\n"
+    "        if (response[0] == 'n' || response[0] == 'N' || strcmp (response, \"0\") == 0)\n"
+    "                return 0;\n"
+    "        return -1;\n"
+    "}\n"
+    "\n"
+    "static bool\n"
+    "ply_command_option_read_arguments (ply_command_option_t *option,"
+)
+assert anchor in src
+src = src.replace(anchor, shim)
+open("src/libply/ply-command-parser.c", "w").write(src)
+PYEOF2
 	meson setup output --prefix=/overlayer/syshub --sysconfdir=/overlayer/syshub/etc \
 		-Dsystemd-integration=true -Ddocs=false
 	meson compile -C output
