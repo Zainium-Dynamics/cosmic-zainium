@@ -14,7 +14,7 @@ blake3           = ""
 ed25519_sig      = ""
 ed25519_pubkey   = ""
 
-depends          = ["systemd"]
+depends          = ["systemd", "xkeyboard-config"]
 provides         = ["plymouth"]
 tags             = ["boot", "base"]
 
