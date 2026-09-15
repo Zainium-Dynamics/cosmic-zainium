@@ -14,6 +14,21 @@ build() {
 	# our xkeyboard-config syshub pkg ships no .pc (data files only);
 	# plymouth only existence-checks this dep, never reads a variable
 	sed -i "s#dependency('xkeyboard-config')#dependency('xkeyboard-config', required: false)#" meson.build
+	# same story for systemd.pc -- our systemd-dev ships libsystemd.pc
+	# but not the top-level systemd.pc metadata package; systemd_dep is
+	# only ever used to derive systemdsystemunitdir, so hardcode it
+	python3 - <<'EOF'
+import re
+src = open("meson.build").read()
+src = src.replace(
+    "systemd_dep = dependency('systemd')\n"
+    "  systemd_unit_dir = systemd_dep.get_variable('systemdsystemunitdir',\n"
+    "    pkgconfig_define: [ 'rootprefix', get_option('prefix') ],\n"
+    "  )",
+    "systemd_unit_dir = '/overlayer/syshub/lib/systemd/system'"
+)
+open("meson.build", "w").write(src)
+EOF
 	meson setup output --prefix=/overlayer/syshub --sysconfdir=/overlayer/syshub/etc \
 		-Dsystemd-integration=true -Ddocs=false
 	meson compile -C output
