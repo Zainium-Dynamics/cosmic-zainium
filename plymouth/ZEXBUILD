@@ -30,6 +30,36 @@ src = src.replace(
 )
 open("meson.build", "w").write(src)
 EOF
+	# execinfo.h is glibc-only; musl has no backtrace(), stub the crash
+	# handler's debug dump instead of losing the whole build over it
+	python3 - <<'PYEOF'
+src = open("src/main.c").read()
+src = src.replace("#include <execinfo.h>\n", "")
+src = src.replace(
+    'static void\n'
+    'write_backtrace (int output_fd)\n'
+    '{\n'
+    '        void *addresses[BACKTRACE_SIZE];\n'
+    '        int number_of_addresses;\n'
+    '\n'
+    '        write (output_fd, "backtrace:\\n", strlen ("backtrace:\\n"));\n'
+    '        number_of_addresses = backtrace (addresses, BACKTRACE_SIZE);\n'
+    '\n'
+    '        if (number_of_addresses <= BACKTRACE_FRAMES_TO_SKIP)\n'
+    '                return;\n'
+    '\n'
+    '        backtrace_symbols_fd (addresses + BACKTRACE_FRAMES_TO_SKIP,\n'
+    '                              number_of_addresses - BACKTRACE_FRAMES_TO_SKIP,\n'
+    '                              output_fd);\n'
+    '}',
+    'static void\n'
+    'write_backtrace (int output_fd)\n'
+    '{\n'
+    '        write (output_fd, "backtrace: unavailable (musl)\\n", strlen ("backtrace: unavailable (musl)\\n"));\n'
+    '}'
+)
+open("src/main.c", "w").write(src)
+PYEOF
 	meson setup output --prefix=/overlayer/syshub --sysconfdir=/overlayer/syshub/etc \
 		-Dsystemd-integration=true -Ddocs=false
 	meson compile -C output
