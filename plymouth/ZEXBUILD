@@ -6,12 +6,13 @@ source="https://www.freedesktop.org/software/plymouth/releases/plymouth-$pkgver.
 0001-overlayer-syshub-font-paths.patch"
 
 makedepends="meson ninja pkgconf libpng-dev eudev-dev pango-dev cairo-dev freetype-dev gtk+3.0-dev libdrm-dev libevdev-dev libxkbcommon-dev xkeyboard-config"
+needs_toolchain="systemd systemd-dev"
 
 build() {
-	cd plymouth-$pkgver
+	export PKG_CONFIG_PATH="/overlayer/syshub/lib/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
 	patch -p1 < ../0001-overlayer-syshub-font-paths.patch
 	meson setup output --prefix=/overlayer/syshub --sysconfdir=/overlayer/syshub/etc \
-		-Dsystemd-integration=false -Ddocs=false
+		-Dsystemd-integration=true -Ddocs=false
 	meson compile -C output
 }
 

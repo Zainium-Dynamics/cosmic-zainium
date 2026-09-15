@@ -14,7 +14,7 @@ blake3           = ""
 ed25519_sig      = ""
 ed25519_pubkey   = ""
 
-depends          = []
+depends          = ["systemd"]
 provides         = ["plymouth"]
 tags             = ["boot", "base"]
 
