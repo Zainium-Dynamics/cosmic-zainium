@@ -3,9 +3,9 @@
 [package]
 name             = "cosmic-applets"
 version          = "1.8.0"
-description      = "COSMIC panel applets, systemd/dbus/flatpak free"
+description      = "COSMIC panel applets"
 license          = "GPL-3.0-only"
-maintainer       = "Ali Zain <alizain@zainiumdynamics.tech>"
+maintainer       = "Zainium Dynamics <alizain@zainiumdynamics.tech>"
 homepage         = "https://github.com/pop-os/cosmic-applets"
 build_type       = "dynamic"
 libc_target      = "musl"
@@ -19,7 +19,8 @@ provides         = ["cosmic-applets"]
 tags             = ["desktop", "cosmic"]
 
 [install]
-bin     = "/overlayer/syshub/bin"
+bin     = "/overlayer/syshub/bin" 
+share   = "/overlayer/syshub/share"
 _syshub = true
 
 [remove]
