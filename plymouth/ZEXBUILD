@@ -3,7 +3,8 @@ pkgname=plymouth
 pkgver=26.134.222
 pkgrel=0
 source="https://www.freedesktop.org/software/plymouth/releases/plymouth-$pkgver.tar.xz
-0001-overlayer-syshub-font-paths.patch"
+0001-overlayer-syshub-font-paths.patch
+0002-script-null-console-viewer.patch"
 
 makedepends="meson ninja pkgconf libpng-dev eudev-dev pango-dev cairo-dev freetype-dev gtk+3.0-dev libdrm-dev libevdev-dev libxkbcommon-dev xkeyboard-config"
 needs_toolchain="systemd systemd-dev xkeyboard-config"
@@ -12,6 +13,8 @@ build() {
 	export PKG_CONFIG_PATH="/overlayer/syshub/lib/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
 	export PATH="/overlayer/syshub/bin:$PATH"
 	patch -p1 < ../0001-overlayer-syshub-font-paths.patch
+	# script themes crashed when no font could be loaded (console viewer left NULL)
+	patch -p1 < ../0002-script-null-console-viewer.patch
 	# our xkeyboard-config syshub pkg ships no .pc (data files only);
 	# plymouth only existence-checks this dep, never reads a variable
 	sed -i "s#dependency('xkeyboard-config')#dependency('xkeyboard-config', required: false)#" meson.build
