@@ -1,0 +1,19 @@
+maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
+pkgname=cosmic-osk
+pkgver=1.9.0
+pkgrel=0
+source="https://github.com/pop-os/cosmic-osk/archive/refs/tags/epoch-$pkgver.tar.gz"
+
+makedepends="cargo eudev-dev just libxkbcommon-dev wayland-dev"
+
+build() {
+	cd cosmic-osk-epoch-$pkgver
+	export VERGEN_GIT_COMMIT_DATE="$(date -u '+%Y-%m-%d')"
+	export VERGEN_GIT_SHA="unknown"
+	cargo build --release --target x86_64-unknown-linux-musl
+}
+
+package() {
+	just rootdir="$PAYLOAD_DIR" prefix=/overlayer/syshub \
+		cargo-target-dir=target/x86_64-unknown-linux-musl install
+}
