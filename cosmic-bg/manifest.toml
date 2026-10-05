@@ -2,7 +2,7 @@
 
 [package]
 name             = "cosmic-bg"
-version          = "1.8.0"
+version          = "1.9.0"
 description      = "COSMIC wallpaper daemon, systemd/dbus/flatpak free"
 license          = "MPL-2.0"
 maintainer       = "Zainium Dynamics <alizain@zainiumdynamics.tech>"
