@@ -160,13 +160,15 @@ jobs:
     container: alpine:latest
     permissions:
       contents: write
-    # Never cancel a release mid-build -- a killed run can leave a
-    # partial GitHub Release (some .zex attached, some not) sitting
-    # there. Each merge to master queues behind whatever's already
-    # running and starts on its own once that one finishes, same as
-    # userland-recipes/syshub-recipes.
+    # One group per commit SHA: every push to master gets its own
+    # release run, and they all run in parallel. A single shared group
+    # (release-master) only ever keeps ONE pending run -- when several
+    # merges land while one is building, GitHub cancels all the older
+    # pending ones and only the newest survives, so those packages never
+    # got built. Each push's diff is against its own github.event.before,
+    # so runs don't overlap in what they build. Never cancel in progress.
     concurrency:
-      group: release-master
+      group: release-${{ github.sha }}
       cancel-in-progress: false
     steps:
       - name: Container prerequisites (glibc shim for actions' Node runtime)
