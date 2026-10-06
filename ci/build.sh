@@ -211,6 +211,28 @@ flatten_prefix() {
     fi
 }
 
+# ── fix shebangs: the kernel execs a script's #!/bin/sh (or
+#    #!/usr/bin/env, etc.) interpreter line completely literally —
+#    there is no /bin, no /usr, and no compatibility symlink to either
+#    on Zainium, so any shipped script with a plain #!/bin/sh (or
+#    #!/bin/bash, #!/usr/bin/env ...) shebang fails to exec outright at
+#    runtime. Every recipe used to have to remember its own sed pass for
+#    this (pop-launcher's ZEXBUILD did); doing it once here for every
+#    package's whole payload means no recipe has to think about it again.
+#    Only touches the first line, and only when it's a bare /bin or
+#    /usr/bin interpreter path -- never touches an already-correct
+#    /overlayer/syshub/... shebang.
+fix_shebangs() {
+    dir="$1"
+    find "$dir" -type f -perm -u+x | while IFS= read -r f; do
+        case "$(head -c 32 "$f" 2>/dev/null)" in
+            '#!/bin/'*|'#!/usr/bin/'*)
+                sed -i '1s|^#!/bin/|#!/overlayer/syshub/bin/|; 1s|^#!/usr/bin/|#!/overlayer/syshub/bin/|' "$f"
+                ;;
+        esac
+    done
+}
+
 # ── verify: every ELF in the payload is actually musl-linked, with its
 #    interpreter under /overlayer/syshub — not a glibc binary that
 #    silently built anyway because $CHOST's cross-compiler wasn't found
@@ -321,6 +343,7 @@ PAYLOAD_DIR="$STAGING_ROOT/pkg/payload"
 mkdir -p "$PAYLOAD_DIR"
 package
 flatten_prefix "$PAYLOAD_DIR"
+fix_shebangs "$PAYLOAD_DIR"
 
 cp "$RECIPE_DIR/manifest.toml" "$STAGING_ROOT/pkg/manifest.toml"
 verify_musl "$PAYLOAD_DIR" "$STAGING_ROOT/pkg/manifest.toml"
@@ -352,6 +375,7 @@ for sub in ${subpackages:-}; do
     PAYLOAD_DIR="$SUBPKG_PAYLOAD_DIR"
     "$subfn"
     flatten_prefix "$SUBPKG_PAYLOAD_DIR"
+    fix_shebangs "$SUBPKG_PAYLOAD_DIR"
 
     cp "$RECIPE_DIR/$sub.manifest.toml" "$STAGING_ROOT/subpkg/$sub/manifest.toml"
     verify_musl "$SUBPKG_PAYLOAD_DIR" "$STAGING_ROOT/subpkg/$sub/manifest.toml"
