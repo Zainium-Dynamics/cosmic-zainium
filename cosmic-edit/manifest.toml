@@ -1,6 +1,6 @@
 [package]
 name             = "cosmic-edit"
-version          = "1.8.0"
+version          = "1.9.0"
 description      = "Text editor for the COSMIC Desktop Environment"
 license          = "GPL-3.0-only"
 maintainer       = "Zainium <alizain@zainiumdynamics.tech>"
