@@ -2,8 +2,8 @@
 
 [package]
 name             = "cosmic-comp"
-version          = "1.9.0"
-description      = "COSMIC Wayland compositor, systemd-free (login1 via quantra-logind + oxibus)"
+version          = "1.10.0"
+description      = "COSMIC Wayland compositor"
 license          = "GPL-3.0-only"
 maintainer       = "Ali Zain <alizain@zainiumdynamics.tech>"
 homepage         = "https://github.com/pop-os/cosmic-comp"
