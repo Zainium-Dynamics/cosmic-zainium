@@ -1,6 +1,6 @@
 maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
 pkgname=pop-launcher
-pkgver=1.7.0
+pkgver=1.10.0
 pkgrel=0
 # Commit archive at the exact pop-os/launcher commit pinned by
 # ~/cosmic-epoch's epoch-1.5.0 submodule set. Patches: systemd removed
@@ -9,9 +9,10 @@ pkgrel=0
 # /overlayer/syshub/... . No dbus/flatpak dependency exists in this
 # component's own Cargo.toml. No sha256sums yet (added once the source
 # URL is final).
-source="https://github.com/pop-os/launcher/archive/6390080a98a4a59b4e8196d28de97d3cb4d138ec.tar.gz
+source="https://github.com/pop-os/launcher/archive/refs/tags/epoch-$pkgver.tar.gz
 0001-overlayer-syshub-paths.patch
-0002-terminal-plugin-syshub-fallback.patch"
+0002-terminal-plugin-syshub-fallback.patch
+0003-zainium-source-labels.patch"
 
 # Was previously a hand-rolled cross-compile env pointing at the mounted
 # ZAINIUM_DRIVE toolchain (not CI-portable). ci/build.sh already builds
@@ -25,12 +26,13 @@ source="https://github.com/pop-os/launcher/archive/6390080a98a4a59b4e8196d28de97
 makedepends="cargo just libevdev-dev"
 
 build() {
-    # GitHub commit-archive extracted-dir name != $pkgname-$pkgver.
-    cd launcher-6390080a98a4a59b4e8196d28de97d3cb4d138ec
+    cd launcher-epoch-$pkgver
 
     patch -p1 < ../0001-overlayer-syshub-paths.patch
     # terminal plugin's last-resort fallback still hardcoded /usr paths
     patch -p1 < ../0002-terminal-plugin-syshub-fallback.patch
+    # "unknown" source label in the launcher for apps under /overlayer
+    patch -p1 < ../0003-zainium-source-labels.patch
 
     export CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_RUSTFLAGS="${CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_RUSTFLAGS:-} -C link-arg=-Wl,--allow-shlib-undefined -C link-arg=-levdev"
 
