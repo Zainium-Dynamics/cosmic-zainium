@@ -1,7 +1,7 @@
 maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
 pkgname=cosmic-comp
 pkgver=1.10.0
-pkgrel=0
+pkgrel=1
 source="https://github.com/pop-os/cosmic-comp/archive/refs/tags/epoch-$pkgver.tar.gz
 0002-bare-session.patch
 0003-shell-spawn-syshub-path.patch"
@@ -22,6 +22,9 @@ package() {
 
 	just rootdir="$PAYLOAD_DIR" prefix=/overlayer/syshub \
 		cargo-target-dir=target/x86_64-unknown-linux-musl install-bare-session
+	# cosmic-session ships the real cosmic-session.target; comp's copy has
+	# RefuseManualStart=yes, which makes `systemctl --user start` fail
+	rm -f "$PAYLOAD_DIR"/overlayer/syshub/lib/systemd/user/cosmic-session.target
 	mv "$PAYLOAD_DIR"/overlayer/syshub/share/wayland-sessions/cosmic.desktop \
 		"$PAYLOAD_DIR"/overlayer/syshub/share/wayland-sessions/cosmic-bare.desktop
 }
