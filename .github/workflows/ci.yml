@@ -31,7 +31,8 @@ jobs:
   check:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
-    container: alpine:latest
+    # ECR mirror of the Docker Hub image: parallel jobs hit Docker Hub's anonymous pull limit
+    container: public.ecr.aws/docker/library/alpine:latest
     concurrency:
       group: check-${{ github.event.pull_request.number }}
       cancel-in-progress: true
@@ -157,7 +158,8 @@ jobs:
   release:
     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
-    container: alpine:latest
+    # ECR mirror of the Docker Hub image: parallel jobs hit Docker Hub's anonymous pull limit
+    container: public.ecr.aws/docker/library/alpine:latest
     permissions:
       contents: write
     # One group per commit SHA: every push to master gets its own
