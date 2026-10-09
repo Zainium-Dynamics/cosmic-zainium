@@ -1,6 +1,6 @@
 maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
 pkgname=cosmic-files
-pkgver=1.8.0
+pkgver=1.10.0
 pkgrel=0
 source="https://github.com/pop-os/cosmic-files/archive/refs/tags/epoch-$pkgver.tar.gz"
 
@@ -12,6 +12,7 @@ build() {
 	export VERGEN_GIT_SHA="unknown"
 	cargo build --release --target x86_64-unknown-linux-musl
 	cargo build --release --target x86_64-unknown-linux-musl --package cosmic-files-applet
+	cargo build --release --target x86_64-unknown-linux-musl --package cosmic-files-thumbnailer
 }
 
 package() {
