@@ -20,7 +20,8 @@ build() {
 
 package() {
 
-	make DESTDIR="$PAYLOAD_DIR" prefix=/overlayer/syshub CARGO_TARGET_DIR=target/x86_64-unknown-linux-musl install-bare-session
+	just rootdir="$PAYLOAD_DIR" prefix=/overlayer/syshub \
+		cargo-target-dir=target/x86_64-unknown-linux-musl install-bare-session
 	mv "$PAYLOAD_DIR"/overlayer/syshub/share/wayland-sessions/cosmic.desktop \
 		"$PAYLOAD_DIR"/overlayer/syshub/share/wayland-sessions/cosmic-bare.desktop
 }
