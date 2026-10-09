@@ -24,6 +24,13 @@ on:
     branches: [master]
   push:
     branches: [master]
+  # Re-run one package's release build on the current master (a plain
+  # re-run of a failed push run replays that commit's old workflow file).
+  workflow_dispatch:
+    inputs:
+      package:
+        description: Package directory to build and release
+        required: true
 
 jobs:
   # PR validation: a stale run is worthless once new commits land on the
@@ -156,7 +163,7 @@ jobs:
   # them to a GitHub Release instead. Download from the release, drop
   # into the OS root, build the ISO.
   release:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     # ECR mirror of the Docker Hub image: parallel jobs hit Docker Hub's anonymous pull limit
     container: public.ecr.aws/docker/library/alpine:latest
@@ -170,7 +177,7 @@ jobs:
     # got built. Each push's diff is against its own github.event.before,
     # so runs don't overlap in what they build. Never cancel in progress.
     concurrency:
-      group: release-${{ github.sha }}
+      group: release-${{ github.sha }}-${{ inputs.package }}
       cancel-in-progress: false
     steps:
       - name: Container prerequisites (glibc shim for actions' Node runtime)
@@ -228,9 +235,12 @@ jobs:
           # ends up empty, falling through to changed-packages.sh's own
           # HEAD~1 default) silently drops everything else.
           BASE_SHA: ${{ github.event.before }}
+          PKG: ${{ inputs.package }}
         run: |
           pkgs_out="$(mktemp)"
-          if ! sh ci/changed-packages.sh > "$pkgs_out"; then
+          if [ -n "$PKG" ]; then
+            echo "$PKG" > "$pkgs_out"
+          elif ! sh ci/changed-packages.sh > "$pkgs_out"; then
             echo "changed-packages.sh failed:"
             cat "$pkgs_out"
             exit 1
@@ -267,7 +277,7 @@ jobs:
         if: success()
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: build-${{ github.sha }}
-          name: build-${{ github.sha }}
+          tag_name: build-${{ github.sha }}${{ inputs.package && format('-{0}', inputs.package) || '' }}
+          name: build-${{ github.sha }}${{ inputs.package && format('-{0}', inputs.package) || '' }}
           files: "*.zex"
           fail_on_unmatched_files: false
