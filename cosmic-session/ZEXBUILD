@@ -1,7 +1,7 @@
 maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
 pkgname=cosmic-session
 pkgver=1.10.0
-pkgrel=0
+pkgrel=1
 source="https://github.com/pop-os/cosmic-session/archive/refs/tags/epoch-1.10.0.tar.gz
 0003-overlayer-syshub-path.patch
 0004-desktop-file-path.patch
@@ -39,5 +39,4 @@ build() {
 package() {
     just rootdir="$PAYLOAD_DIR" prefix=/overlayer/syshub \
         cargo-target-dir=target/x86_64-unknown-linux-musl install
-    rm -rf "$PAYLOAD_DIR"/overlayer/syshub/lib/systemd
 }
