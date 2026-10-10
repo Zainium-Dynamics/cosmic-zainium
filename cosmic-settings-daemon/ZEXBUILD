@@ -23,6 +23,5 @@ build() {
 }
 
 package() {
-    make DESTDIR="$PAYLOAD_DIR" prefix=/overlayer/syshub \
-        geoclue_agent=/overlayer/syshub/libexec/geoclue-2.0/demos/agent install
+    just rootdir="$PAYLOAD_DIR" prefix=/overlayer/syshub install
 }
