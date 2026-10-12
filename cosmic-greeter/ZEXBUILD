@@ -1,7 +1,7 @@
 maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
 pkgname=cosmic-greeter
 pkgver=1.10.0
-pkgrel=0
+pkgrel=1
 source="https://github.com/pop-os/cosmic-greeter/archive/refs/tags/epoch-1.10.0.tar.gz
 0001-main-no-systemd-default-and-elevate-pam.patch
 0003-overlayer-syshub-path.patch
@@ -30,6 +30,8 @@ build() {
     # already applied to cosmic-initial-setup's own /etc/login.defs read.
     patch -p1 < ../0007-login-defs-syshub-path.patch
 
+    # elevate-pam is built into the locker; this is where it finds its config
+    export ELEVATE_PAM_CONFIG_PATH=/overlayer/syshub/etc/elevate-pam/elevate-pam.toml
     cargo build --release --workspace --target x86_64-unknown-linux-musl
 }
 
