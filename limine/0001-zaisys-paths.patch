@@ -1,0 +1,60 @@
+diff -ru a/common/entry.s2.c b/common/entry.s2.c
+--- a/common/entry.s2.c	2026-10-14 00:50:58.324200844 +0500
++++ b/common/entry.s2.c	2026-10-14 00:50:58.415243901 +0500
+@@ -42,8 +42,7 @@
+     bool old_cif = case_insensitive_fopen;
+     case_insensitive_fopen = true;
+     if (true
+-     && (stage3 = fopen(part, "/boot/limine/limine-bios.sys")) == NULL
+-     && (stage3 = fopen(part, "/boot/limine-bios.sys")) == NULL
++     && (stage3 = fopen(part, "/overlayer/zaisys/limine/limine-bios.sys")) == NULL
+      && (stage3 = fopen(part, "/limine/limine-bios.sys")) == NULL
+      && (stage3 = fopen(part, "/limine-bios.sys")) == NULL
+     ) {
+@@ -120,7 +119,7 @@
+     if (!stage3_found) {
+         print("\n"
+               "!! Stage 3 file not found!\n"
+-              "!! Have you copied limine-bios.sys to the root, /boot, /limine, or /boot/limine\n"
++              "!! Have you copied limine-bios.sys to the root, /limine, or /overlayer/zaisys/limine\n"
+               "!! directories of one of the partitions on the boot device?\n\n");
+     }
+ 
+diff -ru a/common/entry.s3.c b/common/entry.s3.c
+--- a/common/entry.s3.c	2026-10-14 00:50:58.326200931 +0500
++++ b/common/entry.s3.c	2026-10-14 00:50:58.415923592 +0500
+@@ -110,8 +110,7 @@
+                  || (f = fopen(volume_index[i], "/EFI/limine/limine.conf")) != NULL
+                  || (f = fopen(volume_index[i], "/EFI/BOOT/limine.conf")) != NULL
+ #endif
+-                 || (f = fopen(volume_index[i], "/boot/limine/limine.conf")) != NULL
+-                 || (f = fopen(volume_index[i], "/boot/limine.conf")) != NULL
++                 || (f = fopen(volume_index[i], "/overlayer/zaisys/limine/limine.conf")) != NULL
+                  || (f = fopen(volume_index[i], "/limine/limine.conf")) != NULL
+                  || (f = fopen(volume_index[i], "/limine.conf")) != NULL
+                 ) {
+diff -ru a/common/lib/config.c b/common/lib/config.c
+--- a/common/lib/config.c	2026-10-14 00:50:58.328201017 +0500
++++ b/common/lib/config.c	2026-10-14 00:50:58.416730259 +0500
+@@ -140,8 +140,7 @@
+ #if defined (UEFI)
+      || (f = fopen(part, use_default_efi_search_path ? "/EFI/BOOT/limine.conf" : efi_app_path)) != NULL
+ #endif
+-     || (f = fopen(part, "/boot/limine/limine.conf")) != NULL
+-     || (f = fopen(part, "/boot/limine.conf")) != NULL
++     || (f = fopen(part, "/overlayer/zaisys/limine/limine.conf")) != NULL
+      || (f = fopen(part, "/limine/limine.conf")) != NULL
+      || (f = fopen(part, "/limine.conf")) != NULL
+     ) {
+diff -ru a/host/limine.c b/host/limine.c
+--- a/host/limine.c	2026-10-14 00:50:58.330201104 +0500
++++ b/host/limine.c	2026-10-14 00:50:58.417846826 +0500
+@@ -1813,7 +1813,7 @@
+         uninstall(true);
+     } else if (!quiet) {
+         fprintf(stderr, "Reminder: Remember to copy the limine-bios.sys file in either\n"
+-                        "          the root, /boot, /limine, or /boot/limine directories of\n"
++                        "          the root, /limine, or /overlayer/zaisys/limine directories of\n"
+                         "          one of the partitions on the device, or boot will fail!\n");
+ 
+         fprintf(stderr, "Limine BIOS stages installed successfully.\n");
