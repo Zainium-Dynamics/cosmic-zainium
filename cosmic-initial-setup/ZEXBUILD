@@ -1,7 +1,7 @@
 maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
 pkgname=cosmic-initial-setup
 pkgver=1.10.0
-pkgrel=0
+pkgrel=1
 # Commit archive at the exact pop-os/cosmic-initial-setup commit pinned by
 # ~/cosmic-epoch's epoch-1.5.0 submodule set (verified: git clone --branch
 # epoch-1.5.0 resolves to the same commit b5ac4182bb00bc774ca86febadf0369e362bc031
@@ -13,7 +13,8 @@ pkgrel=0
 # aports/community APKBUILD for the same package (same epoch-1.5.0 tag,
 # same pop-os source).
 source="https://github.com/pop-os/cosmic-initial-setup/archive/refs/tags/epoch-1.10.0.tar.gz
-0001-overlayer-syshub-paths.patch"
+0001-overlayer-syshub-paths.patch
+0002-screen-reader-off-by-default.patch"
 
 sha256sums=""  # TODO: re-pin for epoch-1.10.0 (was pinned for 1.5.0)
 
@@ -22,6 +23,8 @@ build() {
     cd cosmic-initial-setup-epoch-1.10.0
 
     patch -p1 < ../0001-overlayer-syshub-paths.patch
+    # upstream switches the screen reader on at start; Zainium has no screen reader
+    patch -p1 < ../0002-screen-reader-off-by-default.patch
 
     cargo build --release --target x86_64-unknown-linux-musl
 }
