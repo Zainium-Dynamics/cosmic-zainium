@@ -1,13 +1,14 @@
 maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
 pkgname=cosmic-greeter
 pkgver=1.10.0
-pkgrel=1
+pkgrel=2
 source="https://github.com/pop-os/cosmic-greeter/archive/refs/tags/epoch-1.10.0.tar.gz
 0001-main-no-systemd-default-and-elevate-pam.patch
 0003-overlayer-syshub-path.patch
 0004-elevate-pam-integration.patch
 0006-start-script-syshub-path.patch
-0007-login-defs-syshub-path.patch"
+0007-login-defs-syshub-path.patch
+0008-error-text-wraps-in-column.patch"
 
 sha256sums=""
 makedepends="cargo just eudev-dev libinput-dev libseat-dev libxkbcommon-dev wayland-dev dav1d-dev"
@@ -29,6 +30,8 @@ build() {
     # etc/ payload (see manifest.toml's [install] etc= path), same fix
     # already applied to cosmic-initial-setup's own /etc/login.defs read.
     patch -p1 < ../0007-login-defs-syshub-path.patch
+    # the red error text was cut off at the column edge on the login and lock screens
+    patch -p1 < ../0008-error-text-wraps-in-column.patch
 
     # elevate-pam is built into the locker; this is where it finds its config
     export ELEVATE_PAM_CONFIG_PATH=/overlayer/syshub/etc/elevate-pam/elevate-pam.toml
