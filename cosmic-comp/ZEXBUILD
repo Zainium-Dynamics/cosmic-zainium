@@ -1,10 +1,11 @@
 maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
 pkgname=cosmic-comp
 pkgver=1.10.0
-pkgrel=1
+pkgrel=2
 source="https://github.com/pop-os/cosmic-comp/archive/refs/tags/epoch-$pkgver.tar.gz
 0002-bare-session.patch
-0003-shell-spawn-syshub-path.patch"
+0003-shell-spawn-syshub-path.patch
+0004-touch-single-output.patch"
 
 makedepends="cargo-auditable fontconfig-dev libdisplay-info-dev libinput-dev libseat-dev libxcb-dev libxkbcommon-dev mesa-dev pixman-dev wayland-dev"
 
@@ -12,6 +13,8 @@ build() {
 	cd cosmic-comp-epoch-$pkgver
 	patch -p1 < ../0002-bare-session.patch
 	patch -p1 < ../0003-shell-spawn-syshub-path.patch
+	# touch was only routed to an eDP/LVDS/DSI panel; desktop touch monitors got nothing
+	patch -p1 < ../0004-touch-single-output.patch
 	cp -a "$RECIPE_DIR"/resources/. resources/
 
 	cargo fetch --target x86_64-unknown-linux-musl
