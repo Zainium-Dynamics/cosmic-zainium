@@ -1,0 +1,27 @@
+maintainer="Zainium Dynamics <alizain@zainiumdynamics.tech>"
+pkgname=limine
+pkgver=12.9.3
+pkgrel=0
+source="https://github.com/limine-bootloader/limine/releases/download/v$pkgver/limine-$pkgver.tar.xz
+0001-zaisys-paths.patch"
+sha256sums="95f456a204ce4855a9b5bd72e2cc170080f217edf5e7edf8ded9bb9f3dd4e995  limine-$pkgver.tar.xz"
+makedepends="build-base nasm mtools"
+
+# The release tarball carries its version file, so menus show "Limine 12.9.3" instead of
+# "UNVERSIONED". BOOTX64.EFI and limine-bios.sys from share/limine go into zaisys/limine.
+build() {
+    # Zainium has no /boot: limine.conf and limine-bios.sys are looked up in /overlayer/zaisys/limine
+    patch -p1 < ../0001-zaisys-paths.patch
+
+    ./configure \
+        --prefix=/overlayer/syshub \
+        --enable-bios \
+        --enable-bios-cd \
+        --enable-uefi-x86-64 \
+        --enable-uefi-cd
+    make -j"$(nproc)"
+}
+
+package() {
+    make DESTDIR="$PAYLOAD_DIR" install
+}
