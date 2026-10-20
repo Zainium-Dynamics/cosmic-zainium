@@ -1,14 +1,15 @@
 maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
 pkgname=cosmic-session
 pkgver=1.10.0
-pkgrel=1
+pkgrel=2
 source="https://github.com/pop-os/cosmic-session/archive/refs/tags/epoch-1.10.0.tar.gz
 0003-overlayer-syshub-path.patch
 0004-desktop-file-path.patch
 0005-start-cosmic-no-usr-path.patch
 0006-qt-plugin-path-syshub.patch
 0007-etc-xdg-autostart-syshub-path.patch
-0008-start-cosmic-shebang-syshub-path.patch"
+0008-start-cosmic-shebang-syshub-path.patch
+0009-start-cosmic-bg-first.patch"
 
 sha256sums=""
 
@@ -32,6 +33,8 @@ build() {
     # /overlayer/syshub/bin/sh does, so this was a launch-time failure
     # waiting to happen.
     patch -p1 < ../0008-start-cosmic-shebang-syshub-path.patch
+    # cosmic-bg first, so the wallpaper replaces the compositor's black screen sooner
+    patch -p1 < ../0009-start-cosmic-bg-first.patch
 
     cargo build --release --target x86_64-unknown-linux-musl
 }
