@@ -1,7 +1,7 @@
 maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
 pkgname=cosmic-session
 pkgver=1.10.0
-pkgrel=2
+pkgrel=3
 source="https://github.com/pop-os/cosmic-session/archive/refs/tags/epoch-1.10.0.tar.gz
 0003-overlayer-syshub-path.patch
 0004-desktop-file-path.patch
@@ -9,7 +9,8 @@ source="https://github.com/pop-os/cosmic-session/archive/refs/tags/epoch-1.10.0.
 0006-qt-plugin-path-syshub.patch
 0007-etc-xdg-autostart-syshub-path.patch
 0008-start-cosmic-shebang-syshub-path.patch
-0009-start-cosmic-bg-first.patch"
+0009-start-cosmic-bg-first.patch
+0010-start-cosmic-import-set-variables-only.patch"
 
 sha256sums=""
 
@@ -35,6 +36,8 @@ build() {
     patch -p1 < ../0008-start-cosmic-shebang-syshub-path.patch
     # cosmic-bg first, so the wallpaper replaces the compositor's black screen sooner
     patch -p1 < ../0009-start-cosmic-bg-first.patch
+    # no "SSH_AUTH_SOCK not set" warning on the screen between the greeter and the desktop
+    patch -p1 < ../0010-start-cosmic-import-set-variables-only.patch
 
     cargo build --release --target x86_64-unknown-linux-musl
 }
