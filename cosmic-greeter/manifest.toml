@@ -20,7 +20,9 @@ tags             = ["desktop", "cosmic"]
 
 [install]
 bin     = "/overlayer/syshub/bin"
+lib     = "/overlayer/syshub/lib"
 etc     = "/overlayer/syshub/etc"
+share   = "/overlayer/syshub/share"
 _syshub = true
 
 [remove]

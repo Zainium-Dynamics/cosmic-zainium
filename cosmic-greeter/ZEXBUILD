@@ -1,7 +1,7 @@
 maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
 pkgname=cosmic-greeter
 pkgver=1.10.0
-pkgrel=3
+pkgrel=4
 source="https://github.com/pop-os/cosmic-greeter/archive/refs/tags/epoch-1.10.0.tar.gz
 0001-main-no-systemd-default-and-elevate-pam.patch
 0003-overlayer-syshub-path.patch
@@ -45,4 +45,43 @@ build() {
 package() {
     just rootdir="$PAYLOAD_DIR" prefix=/overlayer/syshub \
         cargo-target-dir=target/x86_64-unknown-linux-musl install
+
+    local sh="$PAYLOAD_DIR/overlayer/syshub"
+    # no /var on Zainium: the greeter's home is under the syshub var
+    cat > "$sh/lib/sysusers.d/cosmic-greeter.conf" <<'END'
+#Type Name           ID GECOS                    Home directory           Shell
+u     cosmic-greeter -  "Cosmic Greeter Account" /overlayer/syshub/var/lib/cosmic-greeter  -
+m     cosmic-greeter video
+m     cosmic-greeter input
+m     cosmic-greeter render
+END
+    cat > "$sh/lib/tmpfiles.d/cosmic-greeter.conf" <<'END'
+d	/overlayer/syshub/var/lib/cosmic-greeter	0750	cosmic-greeter	cosmic-greeter	-
+z	/overlayer/syshub/var/lib/cosmic-greeter	0750	cosmic-greeter	cosmic-greeter	-
+d	/overlayer/syshub/var/lib/cosmic-greeter/.config	0750	cosmic-greeter	cosmic-greeter	-
+z	/overlayer/syshub/var/lib/cosmic-greeter/.config	0750	cosmic-greeter	cosmic-greeter	-
+d	/run/cosmic-greeter	0700	cosmic-greeter	cosmic-greeter	-
+z	/run/cosmic-greeter	0700	cosmic-greeter	cosmic-greeter	-
+d	/run/user/1000	0700	zainium	zainium	-
+z	/run/user/1000	0700	zainium	zainium	-
+END
+
+    # the daemon hands users' backgrounds and settings to the login screen
+    mkdir -p "$sh/lib/systemd/system" "$sh/etc/systemd/system/multi-user.target.wants"
+    cat > "$sh/lib/systemd/system/cosmic-greeter-daemon.service" <<'END'
+[Unit]
+Description=COSMIC Greeter Daemon
+
+[Service]
+Type=dbus
+BusName=com.system76.CosmicGreeter
+ExecStart=/overlayer/syshub/bin/cosmic-greeter-daemon
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+END
+    chmod 644 "$sh/lib/systemd/system/cosmic-greeter-daemon.service"
+    ln -sf /overlayer/syshub/lib/systemd/system/cosmic-greeter-daemon.service \
+        "$sh/etc/systemd/system/multi-user.target.wants/cosmic-greeter-daemon.service"
 }
