@@ -1,7 +1,7 @@
 maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
 pkgname=plymouth
 pkgver=26.134.222
-pkgrel=0
+pkgrel=1
 source="https://www.freedesktop.org/software/plymouth/releases/plymouth-$pkgver.tar.xz
 0001-overlayer-syshub-font-paths.patch
 0002-script-null-console-viewer.patch"
@@ -124,5 +124,12 @@ package() {
 			-e 's#/usr/share/#/overlayer/syshub/share/#g' \
 			-e 's#/usr/#/overlayer/syshub/#g' \
 			"$f"
+	done
+
+	# shutdown, reboot, halt, kexec take a second or two: keep the splash up for a second
+	# so the theme's line fills (systemd-poweroff/-reboot wait for these units to start)
+	for u in poweroff reboot halt kexec; do
+		sed -i '/^ExecStartPost=.*plymouth show-splash$/a ExecStartPost=-/overlayer/syshub/bin/sleep 1' \
+			"$PAYLOAD_DIR/overlayer/syshub/lib/systemd/system/plymouth-$u.service"
 	done
 }
